@@ -1,31 +1,47 @@
 ---
 import { getCollection, render } from 'astro:content';
-import BaseLayout from '../../layouts/BaseLayout.astro';
+import BaseHead from '../../components/BaseHead.astro';
+import Header from '../../components/Header.astro';
+import Footer from '../../components/Footer.astro';
 
+// 1. 生成所有照片的静态路径
 export async function getStaticPaths() {
   const entries = await getCollection('gallery');
   return entries.map(entry => ({
-    params: { slug: entry.id },
+    params: { slug: entry.id }, // Astro 5 使用 entry.id 匹配文件名
     props: { entry },
   }));
 }
 
+// 2. 获取当前页面的数据
 const { entry } = Astro.props;
 const { Content } = await render(entry);
 ---
 
-<BaseLayout title={entry.data.title} description={entry.data.description}>
-  <article class="gallery-article">
-    <h1>{entry.data.title}</h1>
-    {entry.data.cover && <img src={entry.data.cover} alt={entry.data.title} />}
-    <div class="content">
-      <Content />
-    </div>
-  </article>
-</BaseLayout>
-
-<style>
-  .gallery-article { max-width: 800px; margin: 4rem auto; padding: 0 20px; }
-  img { width: 100%; border-radius: 12px; margin: 2rem 0; }
-  h1 { font-family: var(--font-display); font-size: 3rem; text-align: center; }
-</style>
+<html lang="en">
+  <head>
+    <BaseHead title={entry.data.title} description={entry.data.description || ""} />
+    <style>
+      .content-wrap { max-width: 800px; margin: 0 auto; padding: 100px 20px; }
+      .back-link { display: block; margin-bottom: 2rem; color: #d6b25e; text-decoration: none; font-family: var(--font-mono); }
+      .back-link:hover { text-decoration: underline; }
+      .cover-img { width: 100%; border-radius: 12px; margin-bottom: 2rem; border: 1px solid rgba(255,255,255,0.1); }
+      h1 { font-family: var(--font-display); font-size: 3rem; margin-bottom: 1rem; color: #fff; text-align: center; }
+      .prose { line-height: 1.6; font-size: 1.1rem; }
+    </style>
+  </head>
+  <body>
+    <Header />
+    <main class="content-wrap">
+      <a href="/gallery" class="back-link">← Back to Gallery</a>
+      <article>
+        {entry.data.cover && <img src={entry.data.cover} alt={entry.data.title} class="cover-img" />}
+        <h1>{entry.data.title}</h1>
+        <div class="prose">
+          <Content />
+        </div>
+      </article>
+    </main>
+    <Footer />
+  </body>
+</html>
