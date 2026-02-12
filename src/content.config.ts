@@ -5,7 +5,7 @@ const gallery = defineCollection({
 	schema: z.object({
 		title: z.string(),
 		pubDate: z.coerce.date(),
-		cover: z.string(), // 确保这里和你 md 文件里的字段名一致
+		cover: z.string(),
 	}),
 });
 
@@ -19,4 +19,7 @@ const withYou = defineCollection({
 	}),
 });
 
-export const collections = { 'gallery': gallery, 'with-you': withYou };
+export const collections = { 
+	'gallery': gallery, 
+	'with-you': withYou 
+};
