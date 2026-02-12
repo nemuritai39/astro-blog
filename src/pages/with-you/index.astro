@@ -5,49 +5,114 @@ import Header from '../../components/Header.astro';
 import Footer from '../../components/Footer.astro';
 import { SITE_TITLE } from '../../consts';
 
+// 获取 With You 集合并按日期倒序
 const moments = (await getCollection('with-you')).sort(
 	(a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf()
 );
-const PASSWORD = "ghyzhy060309060126"; // <--- 记得改这里
+
+// 设定你的访问密码
+const PASSWORD = "ghyzhy060309060126"; 
 ---
 
 <!doctype html>
 <html lang="en">
 	<head>
-		<BaseHead title={`With You - ${SITE_TITLE}`} />
+		<BaseHead title={`With You - ${SITE_TITLE}`} description="时间的索引" />
 		<style>
-			#gate { position: fixed; inset: 0; background: #050505; z-index: 9999; display: flex; align-items: center; justify-content: center; transition: 1s; }
-			#gate input { background: transparent; border: none; border-bottom: 1px solid #d6b25e; color: #fff; text-align: center; font-family: 'Cinzel'; font-size: 1.5rem; outline: none; padding: 10px; width: 250px; }
-			.unlocked #gate { opacity: 0; visibility: hidden; pointer-events: none; }
-			main { max-width: 800px; margin: 0 auto; padding: 160px 24px; filter: blur(20px); transition: 1.2s; }
+			/* --- 密码门逻辑 --- */
+			#password-gate {
+				position: fixed;
+				inset: 0;
+				background: #050505;
+				z-index: 9999;
+				display: flex;
+				flex-direction: column;
+				align-items: center;
+				justify-content: center;
+				transition: all 1s cubic-bezier(0.16, 1, 0.3, 1);
+			}
+
+			#pwd-input {
+				background: transparent;
+				border: none;
+				border-bottom: 1px solid rgba(214, 178, 94, 0.3);
+				color: #fff;
+				text-align: center;
+				font-family: 'Cinzel', serif;
+				font-size: 1.5rem;
+				letter-spacing: 0.3em;
+				outline: none;
+				width: 260px;
+				padding: 10px;
+			}
+
+			/* 验证成功后的动效 */
+			.unlocked #password-gate {
+				opacity: 0;
+				visibility: hidden;
+				transform: scale(1.1);
+			}
+
+			/* --- 时间轴主体 --- */
+			main { 
+				max-width: 800px; 
+				margin: 0 auto; 
+				padding: 180px 24px; 
+				position: relative;
+				filter: blur(25px); /* 初始模糊 */
+				transition: filter 1.5s ease;
+			}
+
 			.unlocked main { filter: blur(0); }
-			.moment { margin-bottom: 12rem; position: relative; text-align: center; }
-			.moment::before { content: ''; position: absolute; left: 50%; top: -6rem; height: 6rem; width: 1px; background: rgba(214,178,94,0.3); }
-			.date-tag { font-family: 'Cinzel'; color: #d6b25e; font-size: 0.8rem; letter-spacing: 0.3em; margin-bottom: 3rem; }
-			.moment img { width: 100%; height: auto; margin-bottom: 3rem; box-shadow: 0 20px 50px rgba(0,0,0,0.5); }
-			.moment h2 { font-family: 'Cinzel'; font-size: 1.5rem; margin-bottom: 1.5rem; color: #fff; }
-			.moment p { font-family: 'Cormorant Garamond', serif; font-size: 1.2rem; color: rgba(255,255,255,0.6); line-height: 1.8; max-width: 600px; margin: 0 auto; }
-		</style>
-	</head>
-	<body>
-		<div id="gate"><input type="password" id="pwd" placeholder="PASSCODE" autofocus /></div>
-		<Header />
-		<main>
-			{moments.map(m => (
-				<div class="moment">
-					<div class="date-tag">{m.data.pubDate.toDateString()}</div>
-					<img src={m.data.cover} />
-					<h2>{m.data.title}</h2>
-					<p>{m.data.description}</p>
-				</div>
-			))}
-		</main>
-		<Footer />
-		<script define:vars={{ PASSWORD }}>
-			const input = document.getElementById('pwd');
-			input.addEventListener('input', (e) => {
-				if (e.target.value === PASSWORD) document.body.classList.add('unlocked');
-			});
-		</script>
-	</body>
-</html>
+
+			/* 中间的那根金线 */
+			main::before {
+				content: '';
+				position: absolute;
+				left: 50%;
+				top: 180px;
+				bottom: 100px;
+				width: 1px;
+				background: linear-gradient(to bottom, 
+					transparent, 
+					rgba(214, 178, 94, 0.25) 15%, 
+					rgba(214, 178, 94, 0.25) 85%, 
+					transparent);
+				z-index: -1;
+			}
+
+			.moment-item {
+				margin-bottom: 15rem;
+				display: flex;
+				flex-direction: column;
+				align-items: center;
+				position: relative;
+			}
+
+			.date-tag {
+				font-family: 'Cinzel', serif;
+				font-size: 0.75rem;
+				letter-spacing: 0.4em;
+				color: var(--accent-gold, #d6b25e);
+				background: #050505;
+				padding: 8px 20px;
+				border: 1px solid rgba(214, 178, 94, 0.2);
+				margin-bottom: 4rem;
+			}
+
+			.moment-image {
+				width: 100%;
+				box-shadow: 0 30px 80px rgba(0,0,0,0.6);
+				margin-bottom: 3.5rem;
+			}
+
+			.moment-image img {
+				width: 100%;
+				height: auto;
+				display: block;
+				filter: grayscale(10%) brightness(0.9);
+				transition: 1.5s ease;
+			}
+
+			.moment-item:hover img {
+				filter: grayscale(
