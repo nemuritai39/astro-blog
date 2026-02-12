@@ -5,11 +5,19 @@ import Header from '../../components/Header.astro';
 import Footer from '../../components/Footer.astro';
 import { SITE_TITLE } from '../../consts';
 
-// 1. 获取数据逻辑
-const allMoments = await getCollection('with-you');
-const moments = allMoments ? allMoments.sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf()) : [];
+// 1. 暴力抓取：先不排序，看看能不能抓到原始数组
+let moments = [];
+let debugError = "";
 
-// 2. 这里的密码你记得改
+try {
+    moments = await getCollection('with-you');
+    if (moments) {
+        moments.sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
+    }
+} catch (e) {
+    debugError = e.message;
+}
+
 const PASSWORD = "ghyzhy060309060126"; 
 ---
 
@@ -19,91 +27,49 @@ const PASSWORD = "ghyzhy060309060126";
 		<BaseHead title={`With You - ${SITE_TITLE}`} />
 		<style>
 			:root { --gold: #d6b25e; --bg: #050505; }
-			html, body { background: var(--bg) !important; color: #fff; margin: 0; padding: 0; overflow-x: hidden; }
-
-			/* --- 密码门特效 --- */
-			#gate {
-				position: fixed; inset: 0; background: var(--bg); z-index: 10001;
-				display: flex; flex-direction: column; align-items: center; justify-content: center;
-				transition: all 1.2s cubic-bezier(0.16, 1, 0.3, 1);
-			}
-			#gate::before {
-				content: ''; position: absolute; inset: 0;
-				background: radial-gradient(circle at center, rgba(214, 178, 94, 0.08) 0%, transparent 70%);
-				animation: breathe 4s infinite ease-in-out;
-			}
-			@keyframes breathe {
-				0%, 100% { opacity: 0.3; transform: scale(1); }
-				50% { opacity: 0.8; transform: scale(1.1); }
-			}
-			#gate.hidden { opacity: 0; visibility: hidden; transform: scale(1.1); pointer-events: none; }
-
-			.input-wrapper { position: relative; width: 240px; }
-			#pw-box {
-				background: transparent; border: none; border-bottom: 1px solid rgba(214, 178, 94, 0.2);
-				color: #fff; text-align: center; font-family: 'Cinzel', serif; font-size: 1.8rem;
-				width: 100%; outline: none; padding: 10px 0; letter-spacing: 0.2em; position: relative; z-index: 2;
-			}
-			.input-wrapper::after {
-				content: ''; position: absolute; bottom: 0; left: 0; width: 0; height: 1px;
-				background: var(--gold); box-shadow: 0 0 15px var(--gold); transition: width 0.6s ease;
-			}
-			.input-wrapper:focus-within::after { width: 100%; }
-			#gate p { font-family: 'Cinzel'; letter-spacing: 0.5em; color: var(--gold); font-size: 0.7rem; margin-bottom: 2rem; opacity: 0.6; }
-
-			/* --- 内容主体布局 --- */
-			main { 
-				max-width: 800px; margin: 0 auto; padding: 160px 24px; 
-				opacity: 0; filter: blur(30px); transition: all 2s cubic-bezier(0.16, 1, 0.3, 1); 
-			}
-			main.revealed { opacity: 1; filter: blur(0); }
-
-			.moment-card { margin-bottom: 12rem; display: flex; flex-direction: column; align-items: center; text-align: center; position: relative; }
-			.date { font-family: 'Cinzel'; color: var(--gold); font-size: 0.8rem; letter-spacing: 0.3em; margin-bottom: 3rem; border: 1px solid rgba(214, 178, 94, 0.2); padding: 5px 20px; }
-			.moment-card img { width: 100%; height: auto; max-height: 75vh; object-fit: contain; margin-bottom: 3rem; box-shadow: 0 40px 100px rgba(0,0,0,0.7); }
-			h2 { font-family: 'Cinzel'; font-size: 1.5rem; margin-bottom: 1.5rem; color: #fff; font-weight: 400; }
-			p.desc { font-family: 'Cormorant Garamond', serif; font-size: 1.2rem; color: rgba(255,255,255,0.5); line-height: 1.8; font-style: italic; max-width: 600px; }
+			html, body { background: var(--bg) !important; color: #fff; margin: 0; }
+			#gate { position: fixed; inset: 0; background: var(--bg); z-index: 10001; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+			#gate.hidden { display: none; }
+			#pw-box { background: transparent; border: none; border-bottom: 1px solid var(--gold); color: #fff; text-align: center; font-size: 1.8rem; width: 240px; outline: none; }
+			main { max-width: 800px; margin: 0 auto; padding: 160px 24px; }
+			.debug-info { background: #331111; color: #ff5555; padding: 20px; border: 1px solid red; margin-bottom: 20px; font-family: monospace; }
 		</style>
 	</head>
 	<body>
 		<div id="gate">
-			<p>IDENTITY VERIFICATION</p>
-			<div class="input-wrapper">
-				<input type="password" id="pw-box" autofocus />
-			</div>
+			<p style="color:var(--gold); letter-spacing:0.5em;">PASSCODE</p>
+			<input type="password" id="pw-box" autofocus />
 		</div>
 
 		<Header />
-		
 		<main id="main-content">
+			{debugError && <div class="debug-info">报错信息: {debugError}</div>}
+			
+			<div style="color: var(--gold); margin-bottom: 20px;">
+				调试状态：找到文件数量 = {moments.length}
+			</div>
+
 			{moments.length > 0 ? (
 				moments.map((m) => (
-					<div class="moment-card">
-						<div class="date">{m.data.pubDate.toDateString()}</div>
-						<img src={m.data.cover} alt={m.data.title} />
+					<div style="margin-bottom: 100px; text-align: center;">
+						<div style="color:var(--gold)">{m.data.pubDate.toDateString()}</div>
+						<img src={m.data.cover} style="width: 100%; max-height: 70vh; object-fit: contain;" />
 						<h2>{m.data.title}</h2>
-						<p class="desc">{m.data.description}</p>
+						<p>{m.data.description}</p>
 					</div>
 				))
 			) : (
-				<div style="text-align:center; font-family:Cinzel; opacity:0.5; padding-top:100px;">
-					No memories found. Check src/content/with-you/
-				</div>
+				<div style="opacity: 0.5;">依然没找到数据，请确认 src/content/with-you/ 目录下有 .md 文件</div>
 			)}
 		</main>
-
 		<Footer />
 
 		<script define:vars={{ PASSWORD }}>
 			const gate = document.getElementById('gate');
 			const input = document.getElementById('pw-box');
-			const main = document.getElementById('main-content');
-
 			input.addEventListener('input', (e) => {
 				if (e.target.value === PASSWORD) {
 					gate.classList.add('hidden');
-					main.classList.add('revealed');
-					input.blur();
 				}
 			});
 		</script>
