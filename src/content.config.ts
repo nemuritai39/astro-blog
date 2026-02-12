@@ -1,28 +1,29 @@
-import { defineCollection, z } from "astro:content";
+import { defineCollection, z } from 'astro:content';
 
-const baseSchema = z.object({
-  title: z.string(),
-  description: z.string().optional(),
-  pubDate: z.coerce.date(),
-  updatedDate: z.coerce.date().optional(),
-  draft: z.boolean().optional().default(false),
+// 1. 画廊集合
+const gallery = defineCollection({
+	type: 'content',
+	schema: z.object({
+		title: z.string(),
+		pubDate: z.coerce.date(),
+		cover: z.string(), // 图片路径
+		description: z.string().optional(),
+	}),
 });
 
-// Gallery 专用 schema：支持 cover, note, description, tags
-const gallerySchema = z.object({
-  title: z.string(),
-  description: z.string().optional(),
-  note: z.string().optional(),
-  cover: z.string(),
-  pubDate: z.coerce.date(),
-  tags: z.array(z.string()).optional(),
-  draft: z.boolean().optional().default(false),
+// 2. With You 集合
+const withYou = defineCollection({
+	type: 'content',
+	schema: z.object({
+		title: z.string(),
+		pubDate: z.coerce.date(),
+		cover: z.string(),
+		description: z.string(), // 私密内容，必填
+	}),
 });
 
-export const collections = {
-  essays: defineCollection({ type: "content", schema: baseSchema }),
-  poems: defineCollection({ type: "content", schema: baseSchema }),
-  thinking: defineCollection({ type: "content", schema: baseSchema }),
-  goals: defineCollection({ type: "content", schema: baseSchema }),
-  gallery: defineCollection({ type: "content", schema: gallerySchema }),
+// 3. 这里的名称必须对应文件夹名
+export const collections = { 
+	'gallery': gallery, 
+	'with-you': withYou 
 };
