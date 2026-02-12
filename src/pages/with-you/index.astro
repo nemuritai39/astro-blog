@@ -5,114 +5,93 @@ import Header from '../../components/Header.astro';
 import Footer from '../../components/Footer.astro';
 import { SITE_TITLE } from '../../consts';
 
-// 获取 With You 集合并按日期倒序
-const moments = (await getCollection('with-you')).sort(
+// 1. 获取数据，并增加容错处理
+const allMoments = await getCollection('with-you');
+const moments = allMoments ? allMoments.sort(
 	(a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf()
-);
+) : [];
 
-// 设定你的访问密码
+// 2. 这里设定你的最终密码
 const PASSWORD = "ghyzhy060309060126"; 
 ---
 
 <!doctype html>
 <html lang="en">
 	<head>
-		<BaseHead title={`With You - ${SITE_TITLE}`} description="时间的索引" />
+		<BaseHead title={`With You - ${SITE_TITLE}`} />
 		<style>
-			/* --- 密码门逻辑 --- */
-			#password-gate {
+			/* 强力重置背景 */
+			:root { --gold: #d6b25e; }
+			html, body { background: #050505 !important; color: #fff; margin: 0; padding: 0; overflow-x: hidden; }
+
+			/* 极简密码锁 */
+			#gate {
 				position: fixed;
 				inset: 0;
 				background: #050505;
-				z-index: 9999;
+				z-index: 10001;
 				display: flex;
 				flex-direction: column;
 				align-items: center;
 				justify-content: center;
-				transition: all 1s cubic-bezier(0.16, 1, 0.3, 1);
+				transition: opacity 0.8s ease, visibility 0.8s;
 			}
+			#gate.hidden { opacity: 0; visibility: hidden; pointer-events: none; }
 
-			#pwd-input {
+			#pw-box {
 				background: transparent;
 				border: none;
-				border-bottom: 1px solid rgba(214, 178, 94, 0.3);
+				border-bottom: 1px solid rgba(214, 178, 94, 0.4);
 				color: #fff;
 				text-align: center;
 				font-family: 'Cinzel', serif;
-				font-size: 1.5rem;
-				letter-spacing: 0.3em;
+				font-size: 1.8rem;
+				width: 200px;
 				outline: none;
-				width: 260px;
-				padding: 10px;
+				letter-spacing: 0.2em;
 			}
+			#gate p { font-family: 'Cinzel'; font-size: 0.6rem; letter-spacing: 0.4em; color: var(--gold); margin-bottom: 2rem; opacity: 0.6; }
 
-			/* 验证成功后的动效 */
-			.unlocked #password-gate {
-				opacity: 0;
-				visibility: hidden;
-				transform: scale(1.1);
-			}
-
-			/* --- 时间轴主体 --- */
+			/* 内容主体 */
 			main { 
-				max-width: 800px; 
+				max-width: 850px; 
 				margin: 0 auto; 
 				padding: 180px 24px; 
-				position: relative;
-				filter: blur(25px); /* 初始模糊 */
-				transition: filter 1.5s ease;
+				min-height: 100vh;
+				opacity: 0;
+				filter: blur(20px);
+				transition: all 1.5s ease;
 			}
+			main.revealed { opacity: 1; filter: blur(0); }
 
-			.unlocked main { filter: blur(0); }
-
-			/* 中间的那根金线 */
-			main::before {
-				content: '';
+			/* 时间线 */
+			.timeline-line {
 				position: absolute;
 				left: 50%;
 				top: 180px;
 				bottom: 100px;
 				width: 1px;
-				background: linear-gradient(to bottom, 
-					transparent, 
-					rgba(214, 178, 94, 0.25) 15%, 
-					rgba(214, 178, 94, 0.25) 85%, 
-					transparent);
+				background: linear-gradient(to bottom, transparent, rgba(214, 178, 94, 0.2) 10%, rgba(214, 178, 94, 0.2) 90%, transparent);
 				z-index: -1;
 			}
 
-			.moment-item {
-				margin-bottom: 15rem;
+			.moment-card {
+				margin-bottom: 12rem;
 				display: flex;
 				flex-direction: column;
 				align-items: center;
-				position: relative;
+				text-align: center;
 			}
 
-			.date-tag {
-				font-family: 'Cinzel', serif;
+			.date {
+				font-family: 'Cinzel';
+				color: var(--gold);
 				font-size: 0.75rem;
-				letter-spacing: 0.4em;
-				color: var(--accent-gold, #d6b25e);
-				background: #050505;
-				padding: 8px 20px;
-				border: 1px solid rgba(214, 178, 94, 0.2);
-				margin-bottom: 4rem;
+				letter-spacing: 0.3em;
+				margin-bottom: 3rem;
+				border: 1px solid rgba(214, 178, 94, 0.15);
+				padding: 5px 15px;
 			}
 
-			.moment-image {
-				width: 100%;
-				box-shadow: 0 30px 80px rgba(0,0,0,0.6);
-				margin-bottom: 3.5rem;
-			}
-
-			.moment-image img {
-				width: 100%;
-				height: auto;
-				display: block;
-				filter: grayscale(10%) brightness(0.9);
-				transition: 1.5s ease;
-			}
-
-			.moment-item:hover img {
-				filter: grayscale(
+			.moment-card img {
+				width:
