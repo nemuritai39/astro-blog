@@ -1,0 +1,270 @@
+/*
+  nemu · archive — Gothic Minimal (v2)
+  - 深色底 + 红/金点缀
+  - 标题使用中世纪铭文风（Cinzel，可读性更好）
+  - 正文保持可读性（Inter）
+  - 字体通过 HTML link 标签引入，不使用 @import
+*/
+
+:root {
+  --font-display: "Cinzel Decorative","Cinzel","Noto Serif SC","Times New Roman",serif;
+  --font-title: "Grenze Gotisch","Cinzel","Noto Serif SC",serif;
+  --font-brand: "Cinzel","Noto Serif SC",serif;
+  --font-body: "Inter","Noto Serif SC",system-ui,-apple-system,"Segoe UI",Roboto,"PingFang SC","Microsoft YaHei",sans-serif;
+  --bg: 7, 8, 12;
+  --fg: 235, 236, 242;
+  --muted: 170, 173, 184;
+  --border: 255, 255, 255;
+
+  --red: 190, 46, 58;
+  --gold: 214, 178, 94;
+
+  --shadow: 0 18px 60px rgba(0,0,0,.55);
+
+  --radius-xl: 22px;
+  --radius-lg: 16px;
+  --radius-md: 12px;
+
+  --sans: 'Inter', system-ui, -apple-system, Segoe UI, Roboto, Arial;
+  --serif: 'Cinzel', serif; /* readable medieval */
+  --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+
+  --content: 1100px;
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  height: 100%;
+  background: rgb(var(--bg));
+  color: rgb(var(--fg));
+  margin: 0;
+  font-family: var(--sans);
+  text-rendering: geometricPrecision;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+a { color: inherit; }
+
+::selection {
+  background: rgba(var(--gold), .22);
+}
+
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(900px 560px at 22% 18%, rgba(var(--red), .14), transparent 62%),
+    radial-gradient(760px 520px at 78% 26%, rgba(var(--gold), .12), transparent 60%),
+    linear-gradient(180deg, rgba(255,255,255,.03), transparent 30%, rgba(0,0,0,.18));
+  opacity: .95;
+  z-index: 0;
+}
+
+body::after{
+  content:"";
+  position: fixed;
+  inset:0;
+  pointer-events:none;
+  background:
+    repeating-linear-gradient(
+      to right,
+      rgba(255,255,255,.04) 0px,
+      rgba(255,255,255,.04) 1px,
+      transparent 1px,
+      transparent 180px
+    ),
+    repeating-linear-gradient(
+      to bottom,
+      rgba(255,255,255,.035) 0px,
+      rgba(255,255,255,.035) 1px,
+      transparent 1px,
+      transparent 160px
+    );
+  mix-blend-mode: overlay;
+  opacity:.08;
+  z-index: 0;
+}
+
+main, header, footer { position: relative; z-index: 1; }
+
+h1, h2, h3 {
+  font-family: var(--serif);
+  letter-spacing: .06em;
+}
+
+h1{
+  font-family: var(--font-title);
+  letter-spacing: .04em;
+}
+
+h2 {
+  font-size: 1.55rem;
+  margin: 26px 0 10px;
+}
+
+p {
+  line-height: 1.8;
+  margin: 0;
+  color: rgba(var(--fg), .92);
+}
+
+code {
+  font-family: var(--mono);
+  font-size: .95em;
+  padding: .12em .35em;
+  border-radius: 8px;
+  border: 1px solid rgba(255,255,255,.12);
+  background: rgba(255,255,255,.05);
+}
+
+.site-header {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid rgba(255,255,255,.10);
+  background: rgba(var(--bg), .55);
+}
+
+.site-nav{
+  max-width: var(--content);
+  margin: 0 auto;
+  padding: 14px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.site-title a{
+  font-family: var(--serif);
+  letter-spacing: .12em;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  opacity: .95;
+}
+
+.site-title a::before{
+  content: "✠";
+  color: rgba(var(--gold), .95);
+  filter: drop-shadow(0 0 10px rgba(var(--gold), .25));
+  font-size: 1.05rem;
+}
+
+.internal-links{
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.internal-links a{
+  text-decoration: none;
+  font-family: var(--serif);
+  letter-spacing: .12em;
+  font-size: .92rem;
+  padding: 8px 12px;
+  border-radius: 999px;
+  border: 1px solid rgba(255,255,255,.12);
+  background: rgba(255,255,255,.03);
+  opacity: .88;
+  transition: transform .15s ease, opacity .15s ease, border-color .15s ease;
+}
+
+.internal-links a:hover{
+  opacity: 1;
+  border-color: rgba(var(--gold), .55);
+  transform: translateY(-1px);
+}
+
+.internal-links a.active{
+  opacity: 1;
+  border-color: rgba(var(--red), .55);
+  box-shadow: 0 0 0 1px rgba(var(--red), .18), 0 14px 40px rgba(0,0,0,.40);
+}
+
+.site-footer{
+  margin-top: 60px;
+  padding: 26px 0 60px;
+  border-top: 1px solid rgba(var(--border), .12);
+  background: rgba(var(--bg), .35);
+}
+
+.site-footer .inner{
+  max-width: var(--content);
+  margin: 0 auto;
+  padding: 0 20px;
+  display: flex;
+  justify-content: center;
+}
+
+.site-footer .copy{
+  opacity: .72;
+  font-size: .95rem;
+  letter-spacing: .04em;
+}
+html, body{
+  font-family: var(--font-body);
+}
+
+h1,h2,h3,.display,.hero-title{
+  font-family: var(--font-display);
+  letter-spacing: .02em;
+}
+
+.site-title, .brand, .site-title a{
+  font-family: var(--font-display);
+  letter-spacing: .06em;
+  text-transform: uppercase;
+}
+/* ===== Brand typography (only top-left) ===== */
+.na-brandText{
+  font-family: var(--font-brand, var(--font-display));
+  font-size: 15px;
+  letter-spacing: .18em;
+  text-transform: lowercase;
+  opacity: .95;
+
+  /* subtle engraved feeling */
+  text-shadow:
+    0 1px 0 rgba(0,0,0,.45),
+    0 10px 24px rgba(0,0,0,.40);
+}
+
+/* make the dot a designed separator */
+.na-brandText::before,
+.na-brandText::after{
+  content: "·";
+  display: inline-block;
+  margin: 0 .45em;
+  color: rgba(var(--gold), .85);
+  transform: translateY(-1px);
+  text-shadow: 0 0 12px rgba(var(--gold), .18);
+}
+
+/* optional: small underline hairline under brand only */
+.na-brand{
+  position: relative;
+}
+.na-brand::after{
+  content:"";
+  position:absolute;
+  left: 28px;   /* start after sigil */
+  right: -6px;
+  bottom: -10px;
+  height: 1px;
+  background: linear-gradient(90deg,
+    rgba(var(--gold),0),
+    rgba(var(--gold),.35),
+    rgba(var(--red),.25),
+    rgba(var(--gold),0)
+  );
+  opacity: .7;
+}

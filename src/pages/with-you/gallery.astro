@@ -1,0 +1,167 @@
+---
+import BaseHead from "../../components/BaseHead.astro";
+import Header from "../../components/Header.astro";
+import Footer from "../../components/Footer.astro";
+
+const title = "With You · Gallery";
+const description = "与你 · 影像回忆（需要解锁）。";
+---
+
+<html lang="en">
+  <head>
+    <BaseHead title={title} description={description} />
+    <style>
+      .wrap { max-width: 1100px; margin: 0 auto; padding: 56px 20px; }
+      .top h1 { margin: 0; letter-spacing: .02em; }
+      .sub { opacity: .82; margin-top: 10px; }
+      .panel {
+        margin-top: 22px;
+        border: 1px solid rgba(255,255,255,.14);
+        border-radius: 18px;
+        background: #ffffff06;
+        overflow: hidden;
+      }
+      .panel-inner { padding: 18px; }
+      .hint { opacity: .72; margin-top: 10px; font-size: .95rem; }
+      .row { display:flex; gap:12px; flex-wrap: wrap; align-items:center; }
+      input {
+        background: rgba(255,255,255,.06);
+        border: 1px solid rgba(255,255,255,.18);
+        border-radius: 12px;
+        padding: 10px 12px;
+        color: rgba(var(--text), .95);
+        min-width: 240px;
+        outline: none;
+      }
+      button {
+        border: 1px solid rgba(214,178,94,.55);
+        background: rgba(214,178,94,.14);
+        color: rgba(var(--text), .95);
+        border-radius: 12px;
+        padding: 10px 14px;
+        cursor: pointer;
+      }
+      button:hover { border-color: rgba(214,178,94,.9); }
+      .ghost {
+        border: 1px solid rgba(255,255,255,.18);
+        background: rgba(255,255,255,.06);
+      }
+      .ghost:hover { border-color: rgba(255,255,255,.35); }
+      .err { margin-top: 10px; color: rgba(212,60,60,.95); font-size: .95rem; }
+      .hide { display:none; }
+
+      .grid {
+        margin-top: 16px;
+        display:grid;
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        gap: 12px;
+      }
+      .ph {
+        aspect-ratio: 1 / 1;
+        border-radius: 16px;
+        border: 1px solid rgba(255,255,255,.14);
+        background: #ffffff05;
+        display:flex;
+        align-items:center;
+        justify-content:center;
+        opacity: .78;
+      }
+    </style>
+  </head>
+
+  <body>
+    <Header />
+    <main class="wrap">
+      <header class="top">
+        <h1>With You · Gallery</h1>
+        <p class="sub">你们的照片与视频：精选、时间线、旅行。</p>
+      </header>
+
+      <!-- gate -->
+      <section class="panel" id="gate">
+        <div class="panel-inner">
+          <div class="row">
+            <input id="pw" type="password" placeholder="Enter passphrase..." autocomplete="current-password" />
+            <button id="unlock">Unlock</button>
+            <button class="ghost" id="back">Back</button>
+          </div>
+          <div class="hint">没解锁会停在这里；解锁状态由浏览器保存。</div>
+          <div class="err hide" id="err">口令不对。</div>
+        </div>
+      </section>
+
+      <!-- content -->
+      <section class="panel hide" id="content">
+        <div class="panel-inner">
+          <div class="row" style="justify-content: space-between;">
+            <div class="hint" style="margin:0;">已解锁 ✅</div>
+            <button class="ghost" id="lock">Lock</button>
+          </div>
+
+          <div class="grid">
+            <div class="ph">Photo 1</div>
+            <div class="ph">Photo 2</div>
+            <div class="ph">Photo 3</div>
+            <div class="ph">Photo 4</div>
+            <div class="ph">Photo 5</div>
+            <div class="ph">Video</div>
+          </div>
+
+          <div class="hint" style="margin-top:14px;">
+            下一步我们做“照片/视频卡片”与真实资源链接（或用内容集合自动生成）。
+          </div>
+        </div>
+      </section>
+    </main>
+    <Footer />
+
+    <script>
+      const KEY = "nemu_with_you_unlocked";
+
+      const gate = document.getElementById("gate");
+      const content = document.getElementById("content");
+      const err = document.getElementById("err");
+      const pw = document.getElementById("pw");
+      const unlock = document.getElementById("unlock");
+      const lock = document.getElementById("lock");
+      const back = document.getElementById("back");
+
+      function showUnlocked() {
+        gate.classList.add("hide");
+        content.classList.remove("hide");
+      }
+      function showLocked() {
+        content.classList.add("hide");
+        gate.classList.remove("hide");
+        err.classList.add("hide");
+        pw.value = "";
+      }
+
+      if (localStorage.getItem(KEY) === "1") {
+        showUnlocked();
+      }
+
+      unlock.addEventListener("click", () => {
+        if ((pw.value || "").trim().length > 0) {
+          localStorage.setItem(KEY, "1");
+          showUnlocked();
+        } else {
+          err.classList.remove("hide");
+        }
+      });
+
+      pw.addEventListener("keydown", (e) => {
+        if (e.key === "Enter") unlock.click();
+      });
+
+      lock.addEventListener("click", () => {
+        localStorage.removeItem(KEY);
+        showLocked();
+      });
+
+      back.addEventListener("click", () => {
+        window.location.href = "/with-you";
+      });
+    </script>
+  </body>
+</html>
