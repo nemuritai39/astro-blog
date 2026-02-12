@@ -6,6 +6,6 @@ import { defineConfig } from 'astro/config';
 
 // https://astro.build/config
 export default defineConfig({
-	site: 'https://astro-blog.pages.dev',
+	site: 'https://nemu-archive.pages.dev',
 	integrations: [mdx(), sitemap()],
 });
