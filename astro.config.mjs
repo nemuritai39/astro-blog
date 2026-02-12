@@ -10,6 +10,6 @@ export default defineConfig({
 	// - Cloudflare Pages: site: 'https://your-project-name.pages.dev'
 	// - GitHub Pages: site: 'https://your-username.github.io', base: '/astro-blog-main'
 	// - Vercel: site: 'https://your-project.vercel.app'
-	site: 'https://your-site-url.com',
+	site: 'https://astro-blog.pages.dev',
 	integrations: [mdx(), sitemap()],
 });
