@@ -15,11 +15,8 @@ const withYou = defineCollection({
 		title: z.string(),
 		pubDate: z.coerce.date(),
 		cover: z.string(),
-		description: z.string(),
+		description: z.string().optional(), // 改成可选，兼容所有文件
 	}),
 });
 
-export const collections = { 
-	'gallery': gallery, 
-	'with-you': withYou 
-};
+export const collections = { gallery, 'with-you': withYou };
