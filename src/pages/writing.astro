@@ -1,138 +1,142 @@
 ---
-import BaseHead from "../components/BaseHead.astro";
-import Header from "../components/Header.astro";
-import Footer from "../components/Footer.astro";
-import { SITE_TITLE } from "../consts";
+import BaseHead from '../../components/BaseHead.astro';
+import Header from '../../components/Header.astro';
+import Footer from '../../components/Footer.astro';
+import { SITE_TITLE, SITE_DESCRIPTION } from '../../consts';
 
-const pageTitle = `Writing · ${SITE_TITLE}`;
+const categories = [
+	{ id: 'essays', title: '随笔', latin: 'ESSAYS', desc: '记录日常、片段与叙述。', color: 'var(--ivory)' },
+	{ id: 'poems', title: '诗歌', latin: 'POEMS', desc: '短句、节奏与情绪。', color: 'var(--silver)' },
+	{ id: 'thinking', title: '思考', latin: 'THINKING', desc: '观念、推演与自问自答。', color: 'var(--accent-gold)' },
+	{ id: 'goals', title: '目标', latin: 'GOALS', desc: '长期/短期，拆解与回顾。', color: '#b39ddb' },
+];
 ---
 
 <!doctype html>
 <html lang="en">
-  <head>
-    <BaseHead title={pageTitle} description="文字模块：随笔、诗歌、思考、目标。" />
-  </head>
+	<head>
+		<BaseHead title={`Writing - ${SITE_TITLE}`} description={SITE_DESCRIPTION} />
+		<style>
+			main {
+				max-width: 1000px;
+				margin: 0 auto;
+				padding: 100px 20px;
+				min-height: 80vh;
+			}
 
-  <body>
-    <Header />
+			.page-header {
+				text-align: center;
+				margin-bottom: 80px;
+			}
 
-    <main class="wrap">
-      <header class="top">
-        <h1>Writing</h1>
-        <p class="sub">随笔、诗歌、思考、目标。</p>
-      </header>
+			.page-header h1 {
+				font-family: 'Cinzel', serif;
+				font-size: 3rem;
+				letter-spacing: 0.3em;
+				color: var(--ivory);
+				margin-bottom: 10px;
+			}
 
-      <section class="grid">
-        <a class="card" href="/writing/essays">
-          <div class="kicker">Essays</div>
-          <div class="title">随笔</div>
-          <div class="desc">记录日常、片段与叙述。</div>
-        </a>
+			.page-header p {
+				font-family: 'Cormorant Garamond', serif;
+				font-style: italic;
+				color: rgba(255, 255, 255, 0.3);
+				font-size: 1.1rem;
+			}
 
-        <a class="card" href="/writing/poems">
-          <div class="kicker">Poems</div>
-          <div class="title">诗歌</div>
-          <div class="desc">短句、节奏与情绪。</div>
-        </a>
+			/* 档案柜布局 */
+			.archive-container {
+				display: grid;
+				grid-template-columns: repeat(2, 1fr);
+				gap: 40px;
+			}
 
-        <a class="card" href="/writing/thinking">
-          <div class="kicker">Thinking</div>
-          <div class="title">思考</div>
-          <div class="desc">观念、推演与自问自答。</div>
-        </a>
+			@media (max-width: 768px) {
+				.archive-container { grid-template-columns: 1fr; }
+				main { padding: 60px 20px; }
+			}
 
-        <a class="card" href="/writing/goals">
-          <div class="kicker">Goals</div>
-          <div class="title">目标</div>
-          <div class="desc">长期/短期，拆解与回顾。</div>
-        </a>
-      </section>
+			.archive-item {
+				position: relative;
+				padding: 40px;
+				text-decoration: none;
+				border-left: 1px solid rgba(255, 255, 255, 0.05);
+				background: linear-gradient(to right, rgba(255,255,255,0.02), transparent);
+				transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+				overflow: hidden;
+			}
 
-      <section class="note">
-        <h2>How it works</h2>
-        <p>下一步我们会把这四个模块做成“往文件夹丢一篇 Markdown 就自动生成目录与详情页”的内容系统。</p>
-      </section>
-    </main>
+			.archive-item::before {
+				content: '';
+				position: absolute;
+				bottom: 0; left: 0; width: 0%; height: 1px;
+				background: var(--accent-gold);
+				transition: width 0.6s ease;
+				opacity: 0.5;
+			}
 
-    <Footer />
-  </body>
+			.archive-item:hover {
+				background: linear-gradient(to right, rgba(255,255,255,0.05), transparent);
+				transform: translateX(10px);
+				border-left-color: var(--accent-gold);
+			}
+
+			.archive-item:hover::before {
+				width: 100%;
+			}
+
+			.latin-tag {
+				font-family: 'Cinzel', serif;
+				font-size: 0.8rem;
+				letter-spacing: 0.4em;
+				color: var(--accent-gold);
+				margin-bottom: 15px;
+				display: block;
+				opacity: 0.6;
+			}
+
+			.archive-item h2 {
+				font-family: 'Cinzel', serif;
+				font-size: 1.8rem;
+				margin: 10px 0;
+				color: #fff;
+				transition: 0.3s;
+			}
+
+			.archive-item p {
+				font-family: 'Cormorant Garamond', serif;
+				color: rgba(255, 255, 255, 0.4);
+				font-size: 1.1rem;
+				line-height: 1.6;
+				max-width: 280px;
+			}
+
+			/* 每个分类悬停时的色彩光晕 */
+			.item-essays:hover h2 { color: var(--ivory); text-shadow: 0 0 15px rgba(240,235,220,0.3); }
+			.item-poems:hover h2 { color: var(--silver); text-shadow: 0 0 15px rgba(225,229,233,0.3); }
+			.item-thinking:hover h2 { color: var(--accent-gold); text-shadow: 0 0 15px rgba(210,195,160,0.3); }
+			.item-goals:hover h2 { color: #b39ddb; text-shadow: 0 0 15px rgba(179,157,219,0.3); }
+
+		</style>
+	</head>
+	<body>
+		<Header />
+		<main>
+			<section class="page-header">
+				<h1>WRITING</h1>
+				<p>“ 每一份记录，都是对虚无的一次反击。”</p>
+			</section>
+
+			<div class="archive-container">
+				{categories.map((cat) => (
+					<a href={`/writing/${cat.id}`} class={`archive-item item-${cat.id}`}>
+						<span class="latin-tag">{cat.latin}</span>
+						<h2>{cat.title}</h2>
+						<p>{cat.desc}</p>
+					</a>
+				))}
+			</div>
+		</main>
+		<Footer />
+	</body>
 </html>
-
-<style>
-  .wrap{max-width:1100px;margin:0 auto;padding:56px 20px;}
-  .top h1{margin:0}
-  .sub{opacity:.82;margin-top:10px}
-
-  .grid{
-    display:grid;
-    grid-template-columns:repeat(auto-fit,minmax(240px,1fr));
-    gap:16px;
-    margin-top:26px
-  }
-
-  .card{
-    display:block;
-    padding:18px 18px 16px;
-    border:1px solid rgba(255,255,255,.14);
-    border-radius:18px;
-    text-decoration:none;
-    color:inherit;
-    background: rgba(255,255,255,.03);
-    position: relative;
-    overflow: hidden;
-  }
-
-  .card::before{
-    content:"";
-    position:absolute;
-    inset:-1px;
-    background: radial-gradient(600px 180px at 10% 0%, rgba(214,178,94,.14), transparent 55%),
-                radial-gradient(500px 180px at 90% 20%, rgba(212,60,60,.10), transparent 55%);
-    opacity: .75;
-    pointer-events:none;
-  }
-
-  .card:hover{border-color:rgba(214,178,94,.75)}
-  .card:hover .kicker{color:rgba(214,178,94,.95)}
-  .card:hover .title{color:rgba(245,247,250,.98)}
-
-  .kicker{
-    position:relative;
-    display:inline-block;
-    font-size:.82rem;
-    letter-spacing:.18em;
-    text-transform:uppercase;
-    color: rgba(245,247,250,.72);
-  }
-
-  .title{
-    position:relative;
-    margin-top:8px;
-    font-size:1.35rem;
-    font-weight:700;
-    color: rgba(245,247,250,.92);
-  }
-
-  .desc{
-    position:relative;
-    margin-top:8px;
-    opacity:.78;
-    line-height:1.6;
-  }
-
-  .note{
-    margin-top:34px;
-    padding:18px;
-    border:1px solid rgba(255,255,255,.10);
-    border-radius:18px;
-    background: rgba(255,255,255,.02);
-  }
-
-  .note h2{
-    margin:0 0 10px 0;
-    font-size:1.05rem;
-    letter-spacing:.08em;
-    text-transform:uppercase;
-    opacity:.92;
-  }
-</style>
