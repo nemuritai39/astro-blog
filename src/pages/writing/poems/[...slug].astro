@@ -1,13 +1,11 @@
 ---
 import { getCollection, render } from 'astro:content';
-// 【核心修复】这里必须是两个 ../ 因为文件在子文件夹里
-import BaseHead from "../../components/BaseHead.astro"; 
-import Header from "../../components/Header.astro";
-import Footer from "../../components/Footer.astro";
+import BaseHead from '@/components/BaseHead.astro';
+import Header from '@/components/Header.astro';
+import Footer from '@/components/Footer.astro';
 
 export async function getStaticPaths() {
-  // 【修改点】根据文件夹不同分别改为 'essays', 'poems' 等
-  const entries = await getCollection('poems'); 
+  const entries = await getCollection('poems'); // 对应修改这里
   return entries.map(entry => ({
     params: { slug: entry.id },
     props: { entry },
@@ -21,23 +19,13 @@ const { Content } = await render(entry);
 <html lang="en">
   <head>
     <BaseHead title={entry.data.title} description={entry.data.description} />
-    <style>
-      .content-wrap { max-width: 800px; margin: 0 auto; padding: 100px 20px; }
-      .title { font-family: var(--font-display); font-size: 3.5rem; color: #d6b25e; text-align: center; margin-bottom: 10px; }
-      .date { text-align: center; font-family: var(--font-mono); opacity: 0.5; margin-bottom: 50px; }
-      /* 保持你的中世纪字体展示 */
-      .prose { font-size: 1.2rem; line-height: 1.8; color: rgba(255,255,255,0.9); }
-      .back { display: block; margin-bottom: 40px; color: #d6b25e; text-decoration: none; font-family: var(--font-mono); }
-    </style>
   </head>
   <body>
     <Header />
-    <main class="content-wrap">
-      <a href="javascript:history.back()" class="back">† Back</a>
+    <main style="max-width: 800px; margin: 100px auto; padding: 0 20px;">
       <article>
-        <h1 class="title">{entry.data.title}</h1>
-        <div class="date">{entry.data.pubDate.toLocaleDateString()}</div>
-        <div class="prose">
+        <h1 style="font-family: var(--font-display); color: #d6b25e; font-size: 3rem;">{entry.data.title}</h1>
+        <div class="prose" style="line-height: 1.8; margin-top: 40px;">
           <Content />
         </div>
       </article>
