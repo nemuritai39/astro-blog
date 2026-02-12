@@ -14,53 +14,57 @@ import { SITE_TITLE, SITE_DESCRIPTION } from '../consts';
 				width: 100%;
 				max-width: 1200px;
 				margin: 0 auto;
-				padding: 60px 20px;
+				padding: 40px 20px;
+				box-sizing: border-box;
 			}
 
-			/* 标题区域 */
 			.hero-section {
 				text-align: center;
-				margin-bottom: 80px;
+				margin: 60px 0 80px;
 			}
 			.hero-section h1 {
 				font-family: 'Cinzel', serif;
-				font-size: clamp(3rem, 8vw, 5rem);
-				letter-spacing: 0.2em;
+				font-size: clamp(2.5rem, 10vw, 5rem);
+				letter-spacing: 0.15em;
 				background: linear-gradient(to bottom, #fff, #d6b25e);
 				-webkit-background-clip: text;
 				-webkit-text-fill-color: transparent;
-				margin-bottom: 20px;
+				margin: 10px 0;
 			}
 			.hero-section .mark {
-				color: #d6b25e;
-				font-size: 1.5rem;
-				margin-bottom: 20px;
-				display: block;
+				color: var(--accent-gold);
+				font-size: 1.2rem;
+				opacity: 0.8;
 			}
 
-			/* 祭坛网格布局 */
+			/* 响应式祭坛网格 */
 			.altar-grid {
 				display: grid;
 				grid-template-columns: repeat(3, 1fr);
-				gap: 30px;
+				gap: 25px;
 			}
 
-			@media (max-width: 900px) {
+			/* 手机端深度优化：垂直堆叠并增加呼吸感 */
+			@media (max-width: 800px) {
 				.altar-grid {
 					grid-template-columns: 1fr;
+					gap: 20px;
+					padding: 0 10px;
 				}
+				.temple-card {
+					padding: 45px 20px !important;
+				}
+				.hero-section { margin-bottom: 40px; }
 			}
 
-			/* 通用卡片基础 */
 			.temple-card {
 				position: relative;
-				background: linear-gradient(145deg, rgba(20,20,20,0.9), rgba(10,10,10,0.95));
+				background: linear-gradient(145deg, rgba(25,25,25,0.9), rgba(10,10,10,1));
 				border: 1px solid rgba(255, 255, 255, 0.05);
-				border-radius: 2px;
 				padding: 60px 30px;
 				text-align: center;
 				text-decoration: none;
-				transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+				transition: all 0.5s cubic-bezier(0.2, 1, 0.3, 1);
 				display: flex;
 				flex-direction: column;
 				align-items: center;
@@ -69,64 +73,47 @@ import { SITE_TITLE, SITE_DESCRIPTION } from '../consts';
 
 			.temple-card:hover {
 				transform: translateY(-8px);
-				background: linear-gradient(145deg, rgba(25,25,25,0.95), rgba(15,15,15,1));
+				border-color: rgba(255, 255, 255, 0.15);
 			}
 
 			.temple-card h2 {
 				font-family: 'Cinzel', serif;
-				font-size: 1.7rem;
+				font-size: 1.6rem;
 				letter-spacing: 0.2em;
-				margin: 20px 0;
-				transition: all 0.4s;
+				margin: 15px 0;
+				transition: 0.4s;
 			}
 
 			.temple-card p {
 				font-family: 'Cormorant Garamond', serif;
 				font-style: italic;
 				color: rgba(255, 255, 255, 0.3);
-				font-size: 1.05rem;
-				line-height: 1.6;
-				max-width: 240px;
-				transition: color 0.4s;
+				font-size: 1rem;
+				line-height: 1.5;
+				max-width: 220px;
 			}
 
 			.stud {
 				width: 6px; height: 6px;
 				transform: rotate(45deg);
-				margin-bottom: 12px;
-				transition: all 0.4s;
-				background: rgba(255,255,255,0.15);
+				margin-bottom: 10px;
+				background: rgba(255,255,255,0.1);
 			}
 
-			/* --- 褪色金属系配色 (低饱和度) --- */
-
-			/* 1. Writing - 象牙白 (Ivory White) */
-			.card-writing:hover {
-				border-color: rgba(240, 235, 220, 0.25);
-				box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6);
+			/* 手机端特定：取消部分悬停位移避免误触感不佳 */
+			@media (hover: none) {
+				.temple-card:active { transform: scale(0.98); }
 			}
-			.card-writing h2 { color: #f0ebdc; }
-			.card-writing .stud { background: #f0ebdc; box-shadow: 0 0 10px rgba(240, 235, 220, 0.3); }
-			.card-writing:hover p { color: rgba(240, 235, 220, 0.5); }
 
-			/* 2. Gallery - 银灰 (Silver Mist) */
-			.card-gallery:hover {
-				border-color: rgba(220, 225, 230, 0.25);
-				box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6);
-			}
-			.card-gallery h2 { color: #e1e5e9; }
-			.card-gallery .stud { background: #e1e5e9; box-shadow: 0 0 10px rgba(225, 230, 235, 0.3); }
-			.card-gallery:hover p { color: rgba(225, 230, 235, 0.5); }
+			/* 配色方案 */
+			.card-writing:hover h2 { color: #f0ebdc; }
+			.card-writing:hover .stud { background: #f0ebdc; box-shadow: 0 0 10px #f0ebdc; }
 
-			/* 3. With You - 淡沙金 (Pale Sand Gold) - 已调低饱和度 */
-			.card-with-you:hover {
-				border-color: rgba(210, 195, 160, 0.25);
-				box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6);
-			}
-			.card-with-you h2 { color: #d2c3a0; } /* 这是一个非常克制的灰金色 */
-			.card-with-you .stud { background: #d2c3a0; box-shadow: 0 0 10px rgba(210, 195, 160, 0.3); }
-			.card-with-you:hover p { color: rgba(210, 195, 160, 0.5); }
+			.card-gallery:hover h2 { color: #e1e5e9; }
+			.card-gallery:hover .stud { background: #e1e5e9; box-shadow: 0 0 10px #e1e5e9; }
 
+			.card-with-you:hover h2 { color: #d2c3a0; }
+			.card-with-you:hover .stud { background: #d2c3a0; box-shadow: 0 0 10px #d2c3a0; }
 		</style>
 	</head>
 	<body>
@@ -136,20 +123,17 @@ import { SITE_TITLE, SITE_DESCRIPTION } from '../consts';
 				<span class="mark">✠</span>
 				<h1>NEMU · ARCHIVE</h1>
 			</section>
-
 			<div class="altar-grid">
-				<a href="/writing" class="temple-card card-writing">
+				<a href="/writing/essays" class="temple-card card-writing">
 					<div class="stud"></div>
 					<h2>WRITING</h2>
 					<p>“ 在墨痕的间隙，捕捉灵魂碎裂的低语。”</p>
 				</a>
-
 				<a href="/gallery" class="temple-card card-gallery">
 					<div class="stud"></div>
 					<h2>GALLERY</h2>
 					<p>“ 光影的残像，是时间在这个世界留下的唯一证词。”</p>
 				</a>
-
 				<a href="/with-you" class="temple-card card-with-you">
 					<div class="stud"></div>
 					<h2>WITH YOU</h2>
