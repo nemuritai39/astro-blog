@@ -5,59 +5,110 @@ import Footer from '../components/Footer.astro';
 import { SITE_TITLE, SITE_DESCRIPTION } from '../consts';
 
 const categories = [
-	{ id: 'essays', title: '随笔', latin: 'ESSAYS', desc: '记录日常、片段与叙述。', color: 'var(--ivory)' },
-	{ id: 'poems', title: '诗歌', latin: 'POEMS', desc: '短句、节奏与情绪。', color: 'var(--silver)' },
-	{ id: 'thinking', title: '思考', latin: 'THINKING', desc: '观念、推演与自问自答。', color: 'var(--accent-gold)' },
-	{ id: 'goals', title: '目标', latin: 'GOALS', desc: '长期/短期，拆解与回顾。', color: '#b39ddb' },
+	{ 
+		id: 'essays', 
+		title: '随笔', 
+		latin: 'ESSAYS', 
+		desc: '在墨痕的间隙，捕捉灵魂碎裂的低语。', 
+		color: 'var(--ivory)',
+		quote: '“文字是思绪在雪堆压出的痕迹。”'
+	},
+	{ 
+		id: 'poems', 
+		title: '诗歌', 
+		latin: 'POEMS', 
+		desc: '捕捉碎裂的韵律，在短句的尽头等待回声。', 
+		color: 'var(--silver)',
+		quote: '“韵律是跳动的脉搏。”'
+	},
+	{ 
+		id: 'thinking', 
+		title: '思考', 
+		latin: 'THINKING', 
+		desc: '于无声处听惊雷，在自省中重构世界。', 
+		color: 'var(--accent-gold)',
+		quote: '“自省是通往真实的唯一路径。”'
+	},
+	{ 
+		id: 'goals', 
+		title: '目标', 
+		latin: 'GOALS', 
+		desc: '尚未达成的契约，终将成为现实的刻度。', 
+		color: '#b39ddb',
+		quote: '“与未来的自己立下字据。”'
+	},
 ];
 ---
 
 <!doctype html>
 <html lang="en">
 	<head>
-		<BaseHead title={`Writing - ${SITE_TITLE}`} description={SITE_DESCRIPTION} />
+		<BaseHead title={`Archives - ${SITE_TITLE}`} description={SITE_DESCRIPTION} />
 		<style>
-			main {
-				max-width: 1000px;
-				margin: 0 auto;
-				padding: 80px 20px;
-			}
-			.page-header { text-align: center; margin-bottom: 80px; }
-			.page-header h1 { font-family: 'Cinzel', serif; font-size: 3rem; letter-spacing: 0.3em; color: var(--ivory); }
+			main { max-width: 1000px; margin: 0 auto; padding: 100px 20px; }
+			.page-header { text-align: center; margin-bottom: 100px; }
+			.page-header h1 { font-family: 'Cinzel', serif; font-size: 3rem; letter-spacing: 0.4em; color: var(--ivory); }
 			
-			.archive-container { display: grid; grid-template-columns: repeat(2, 1fr); gap: 40px; }
-			@media (max-width: 768px) { .archive-container { grid-template-columns: 1fr; } }
+			.archive-grid { display: grid; grid-template-columns: 1fr; gap: 60px; }
 
-			.archive-item {
-				position: relative; padding: 40px; text-decoration: none;
-				border-left: 1px solid rgba(255, 255, 255, 0.05);
-				background: linear-gradient(to right, rgba(255,255,255,0.02), transparent);
-				transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+			.category-row {
+				display: flex;
+				align-items: flex-start;
+				text-decoration: none;
+				padding-bottom: 40px;
+				border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+				transition: all 0.6s ease;
 			}
-			.archive-item::before {
-				content: ''; position: absolute; bottom: 0; left: 0; width: 0%; height: 1px;
-				background: var(--accent-gold); transition: width 0.6s ease;
-			}
-			.archive-item:hover { transform: translateX(10px); border-left-color: var(--accent-gold); background: rgba(255,255,255,0.05); }
-			.archive-item:hover::before { width: 100%; }
 
-			.latin-tag { font-family: 'Cinzel', serif; font-size: 0.8rem; letter-spacing: 0.4em; color: var(--accent-gold); opacity: 0.6; display: block; margin-bottom: 10px; }
-			.archive-item h2 { font-family: 'Cinzel', serif; font-size: 1.8rem; margin: 10px 0; color: #fff; }
-			.archive-item p { font-family: 'Cormorant Garamond', serif; color: rgba(255, 255, 255, 0.4); font-size: 1.1rem; }
+			.category-row:hover { border-bottom-color: rgba(214, 178, 94, 0.2); transform: translateX(10px); }
+
+			.cat-id {
+				font-family: 'Cinzel', serif;
+				font-size: 0.9rem;
+				color: var(--accent-gold);
+				width: 120px;
+				flex-shrink: 0;
+				padding-top: 10px;
+			}
+
+			.cat-content { flex-grow: 1; }
+			.cat-content h2 { font-family: 'Cinzel', serif; font-size: 2rem; margin: 0 0 10px 0; color: #fff; transition: 0.4s; }
+			.cat-content p { font-family: 'Cormorant Garamond', serif; font-style: italic; color: rgba(255, 255, 255, 0.4); font-size: 1.2rem; margin: 0; }
+			
+			.cat-quote {
+				font-size: 0.85rem;
+				color: var(--accent-gold);
+				opacity: 0;
+				transition: 0.6s;
+				margin-top: 15px;
+				font-family: 'EB Garamond', serif;
+			}
+
+			.category-row:hover .cat-quote { opacity: 0.5; }
+			.category-row:hover h2 { letter-spacing: 0.1em; }
+
+			@media (max-width: 768px) {
+				.category-row { flex-direction: column; }
+				.cat-id { margin-bottom: 10px; }
+			}
 		</style>
 	</head>
 	<body>
 		<Header />
 		<main>
 			<section class="page-header">
-				<h1>WRITING</h1>
+				<h1>THE ARCHIVES</h1>
 			</section>
-			<div class="archive-container">
+
+			<div class="archive-grid">
 				{categories.map((cat) => (
-					<a href={`/writing/${cat.id}`} class="archive-item">
-						<span class="latin-tag">{cat.latin}</span>
-						<h2>{cat.title}</h2>
-						<p>{cat.desc}</p>
+					<a href={`/writing/${cat.id}`} class="category-row">
+						<span class="cat-id">{cat.latin}</span>
+						<div class="cat-content">
+							<h2 style={`color: ${cat.color}`}>{cat.title}</h2>
+							<p>{cat.desc}</p>
+							<div class="cat-quote">{cat.quote}</div>
+						</div>
 					</a>
 				))}
 			</div>
