@@ -5,23 +5,11 @@ import Header from '../../components/Header.astro';
 import Footer from '../../components/Footer.astro';
 import { SITE_TITLE } from '../../consts';
 
-// 调试开始
-let rawMoments = [];
-let errorMsg = "";
+// 1. 获取数据，加一个空数组兜底
+const posts = (await getCollection('with-you')) || [];
+const sortedPosts = posts.sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
 
-try {
-    // 强制抓取集合
-    rawMoments = await getCollection('with-you');
-} catch (e) {
-    errorMsg = e.message;
-}
-
-// 只有抓到数据才排序
-const moments = rawMoments.length > 0 
-    ? rawMoments.sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf())
-    : [];
-
-const PASSWORD = "ghyzhy060309060126"; 
+const PASSWORD = "0309"; 
 ---
 
 <!doctype html>
@@ -30,44 +18,38 @@ const PASSWORD = "ghyzhy060309060126";
 		<BaseHead title={`With You - ${SITE_TITLE}`} />
 		<style>
 			:root { --gold: #d6b25e; --bg: #050505; }
-			html, body { background: var(--bg) !important; color: #fff; margin: 0; padding: 0; }
+			html, body { background: var(--bg) !important; color: #fff; margin: 0; }
 			#gate { position: fixed; inset: 0; background: var(--bg); z-index: 10001; display: flex; flex-direction: column; align-items: center; justify-content: center; }
 			#gate.hidden { display: none; }
-			#pw-box { background: transparent; border: none; border-bottom: 1px solid var(--gold); color: #fff; text-align: center; font-size: 1.8rem; width: 260px; outline: none; letter-spacing: 0.1em; }
-			main { max-width: 800px; margin: 0 auto; padding: 160px 24px; min-height: 100vh; }
-			.card { margin-bottom: 100px; border-bottom: 1px solid rgba(214,178,94,0.1); padding-bottom: 50px; text-align: center; }
-			.card img { width: 100%; max-height: 70vh; object-fit: contain; margin: 2rem 0; box-shadow: 0 20px 50px rgba(0,0,0,0.5); }
-			.debug-panel { background: #1a1a1a; border: 1px dashed var(--gold); padding: 1rem; margin-bottom: 2rem; font-family: monospace; font-size: 0.8rem; }
+			#pw-box { background: transparent; border: none; border-bottom: 1px solid var(--gold); color: #fff; text-align: center; font-size: 1.8rem; width: 260px; outline: none; }
+			main { max-width: 800px; margin: 0 auto; padding: 150px 24px; }
+			.memory-item { margin-bottom: 120px; text-align: center; }
+			.memory-item img { width: 100%; max-height: 75vh; object-fit: contain; margin: 2rem 0; box-shadow: 0 30px 60px rgba(0,0,0,0.5); }
+			h2, .date { font-family: 'Cinzel', serif; }
+			.date { color: var(--gold); letter-spacing: 0.2em; }
+			.desc { color: rgba(255,255,255,0.5); font-style: italic; }
 		</style>
 	</head>
 	<body>
 		<div id="gate">
-			<p style="font-family: Cinzel; color: var(--gold); letter-spacing: 0.5em; margin-bottom: 2rem;">IDENTITY VERIFICATION</p>
+			<p style="color: var(--gold); letter-spacing: 0.5em; font-family: Cinzel;">PASSCODE</p>
 			<input type="password" id="pw-box" autofocus />
 		</div>
 
 		<Header />
-		<main id="main-content">
-			<div class="debug-panel">
-				<p>🔍 诊断信息：</p>
-				<p>● 集合名称：with-you</p>
-				<p>● 抓取到文件数：{rawMoments.length}</p>
-				{errorMsg && <p style="color: #ff4444;">● 报错捕捉：{errorMsg}</p>}
-			</div>
-
-			{moments.length > 0 ? (
-				moments.map((m) => (
-					<div class="card">
-						<div style="font-family: Cinzel; color: var(--gold);">{m.data.pubDate.toDateString()}</div>
-						<img src={m.data.cover} alt={m.data.title} />
-						<h2 style="font-family: Cinzel;">{m.data.title}</h2>
-						<p style="color: rgba(255,255,255,0.6); font-style: italic;">{m.data.description}</p>
+		<main>
+			{sortedPosts.length > 0 ? (
+				sortedPosts.map((post) => (
+					<div class="memory-item">
+						<div class="date">{post.data.pubDate.toDateString()}</div>
+						<img src={post.data.cover} alt={post.data.title} />
+						<h2>{post.data.title}</h2>
+						{post.data.description && <p class="desc">{post.data.description}</p>}
 					</div>
 				))
 			) : (
-				<div style="text-align: center; opacity: 0.5; margin-top: 5rem;">
-					<p>即便抓取成功，如果 Markdown 格式不匹配 config.ts，也会显示为 0。</p>
-					<p>请确保 src/content/with-you/ 下的文件是以 .md 结尾。</p>
+				<div style="text-align:center; padding: 100px; opacity:0.5;">
+					No memories found. Total: {sortedPosts.length}
 				</div>
 			)}
 		</main>
@@ -79,7 +61,6 @@ const PASSWORD = "ghyzhy060309060126";
 			input.addEventListener('input', (e) => {
 				if (e.target.value === PASSWORD) {
 					gate.classList.add('hidden');
-					input.blur();
 				}
 			});
 		</script>
