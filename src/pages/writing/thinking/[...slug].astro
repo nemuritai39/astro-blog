@@ -1,72 +1,35 @@
 ---
-import BaseHead from "../../../components/BaseHead.astro";
-import Header from "../../../components/Header.astro";
-import Footer from "../../../components/Footer.astro";
-
-// ✅ glob 必须是字面量
-const modules = import.meta.glob("../../../content/thinking/**/*.{md,mdx}", { eager: true }) as Record<
-  string,
-  any
->;
-
-function filePathToSlug(filePath: string, marker: string) {
-  const normalized = filePath.replaceAll("\\", "/");
-  const after = normalized.split(marker)[1] || "";
-  return after.replace(/\.(md|mdx)$/, "");
-}
-
-function paramsSlugToString(paramsSlug: unknown) {
-  if (Array.isArray(paramsSlug)) return paramsSlug.join("/");
-  if (typeof paramsSlug === "string") return paramsSlug;
-  return "";
-}
+import { getCollection, render } from 'astro:content';
+import BaseHead from '../../components/BaseHead.astro';
+import Header from '../../components/Header.astro';
+import Footer from '../../components/Footer.astro';
 
 export async function getStaticPaths() {
-  return Object.keys(modules).map((p) => {
-    const slug = filePathToSlug(p, "/content/thinking/");
-    // ✅ [...slug] 需要数组段
-    return { params: { slug: slug.split("/") } };
-  });
+  // 【关键修改点】这里要改成对应的集合名，如 'poems'
+  const entries = await getCollection('thinking'); 
+  return entries.map(entry => ({
+    params: { slug: entry.id },
+    props: { entry },
+  }));
 }
 
-const slug = paramsSlugToString(Astro.params.slug);
-
-const hit = Object.entries(modules).find(([p]) => filePathToSlug(p, "/content/thinking/") === slug);
-if (!hit) throw new Error(`Post not found (thinking): ${slug}`);
-
-const mod: any = hit[1];
-const frontmatter = mod.frontmatter ?? {};
-const Content = mod.default;
-
-const pageTitle = `${frontmatter.title ?? slug} · nemu · archive`;
-const description = frontmatter.description ?? frontmatter.excerpt ?? "";
+const { entry } = Astro.props;
+const { Content } = await render(entry);
 ---
 
 <html lang="en">
-  <head>
-    <BaseHead title={pageTitle} description={description} />
-    <style>
-      .wrap{ max-width:1100px; margin:0 auto; padding:68px 20px; }
-      .title{ font-family:var(--font-display); letter-spacing:.06em; font-size:clamp(34px,4.6vw,52px); margin:0 0 10px; }
-      .meta{ opacity:.68; margin:0 0 22px; }
-      .content{ max-width:78ch; line-height:1.95; opacity:.92; }
-      .content :global(p){ margin:0 0 14px; }
-      .content :global(h2){ margin:28px 0 10px; }
-      .content :global(img){ max-width:100%; border-radius:16px; }
-      .content :global(a){ text-decoration:underline; text-underline-offset:3px; }
-    </style>
-  </head>
-
+  <head><BaseHead title={entry.data.title} description={entry.data.description} /></head>
   <body>
     <Header />
-    <main class="wrap">
-      <h1 class="title">{frontmatter.title ?? slug}</h1>
-      <div class="meta">
-        {frontmatter.pubDate ? new Date(frontmatter.pubDate).toLocaleDateString("zh-CN") : ""}
-      </div>
-
-      <article class="content">
-        <Content />
+    <main style="max-width: 700px; margin: 100px auto; padding: 0 20px;">
+      <article>
+        <h1 style="font-family: var(--font-display); font-size: 2.5rem; color: #d6b25e;">{entry.data.title}</h1>
+        <div style="font-family: var(--font-mono); opacity: 0.5; margin-bottom: 2rem;">
+          {entry.data.pubDate.toLocaleDateString()}
+        </div>
+        <div class="prose" style="line-height: 1.8;">
+          <Content />
+        </div>
       </article>
     </main>
     <Footer />
