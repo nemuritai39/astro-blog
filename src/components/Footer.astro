@@ -1,29 +1,40 @@
 ---
-import { SITE_TITLE } from "../consts";
+const today = new Date();
 ---
 
-<footer class="site-footer">
-	<div class="inner">
-		<div class="copy">© {new Date().getFullYear()} {SITE_TITLE}. All rights reserved.</div>
-	</div>
+<footer>
+	<div class="divider"></div>
+	<p>
+		<span>✠</span> 
+		NEMU ARCHIVE {today.getFullYear()}
+	</p>
 </footer>
 
 <style>
-	.site-footer{
-		margin-top: 60px;
-		padding: 26px 0 60px;
-		border-top: 1px solid rgba(var(--border), .12);
-		background: rgba(var(--bg), .35);
+	footer {
+		padding: 80px 20px 40px;
+		text-align: center;
+		/* 让文字变得极淡，只有鼠标滑过时才稍微清晰 */
+		color: rgba(255, 255, 255, 0.1);
+		font-family: 'Cinzel', serif;
+		font-size: 0.7rem;
+		letter-spacing: 0.4em;
+		transition: color 1s ease;
 	}
-	.inner{
-		max-width: 1100px;
-		margin: 0 auto;
-		padding: 0 20px;
-		display:flex;
-		justify-content:center;
+
+	footer:hover {
+		color: rgba(214, 178, 94, 0.4);
 	}
-	.copy{
-		opacity: .72;
-		font-size: .95rem;
+
+	.divider {
+		width: 40px;
+		height: 1px;
+		background: rgba(214, 178, 94, 0.2);
+		margin: 0 auto 20px;
+	}
+
+	span {
+		margin-right: 10px;
+		font-size: 0.9rem;
 	}
 </style>
