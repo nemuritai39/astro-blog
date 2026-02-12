@@ -4,113 +4,93 @@ import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 import { SITE_TITLE, SITE_DESCRIPTION } from '../consts';
 ---
-
 <!doctype html>
 <html lang="en">
 	<head>
 		<BaseHead title={SITE_TITLE} description={SITE_DESCRIPTION} />
 		<style>
-			/* 这里是你那套神级全局样式 */
-			:root {
-				--bg-dark: #0a0a0a;
-				--accent-gold: #d2c3a0;
-				--ivory: #f0ebdc;
-			}
-
-			body {
-				background-color: var(--bg-dark);
-				color: #e0e0e0;
-				font-family: 'EB Garamond', serif;
-				margin: 0;
-				overflow-x: hidden;
-			}
-
-			/* 噪点背景纹理 */
-			body:before {
-				content: "";
-				position: fixed;
-				top: 0;
-				left: 0;
-				width: 100vw;
-				height: 100vh;
-				background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
-				opacity: 0.04;
-				pointer-events: none;
-				z-index: 9999;
-			}
-
-			/* 鼠标跟随光晕 */
-			#cursor-light {
-				position: fixed;
-				top: 0;
-				left: 0;
-				width: 600px;
-				height: 600px;
-				background: radial-gradient(circle, rgba(210, 195, 160, 0.06) 0%, transparent 70%);
-				border-radius: 50%;
-				pointer-events: none;
-				transform: translate(-50%, -50%);
-				z-index: 0;
-				transition: opacity 0.5s ease;
-			}
-
 			main {
+				max-width: 1200px;
+				margin: 0 auto;
+				padding: 60px 20px;
 				position: relative;
 				z-index: 1;
-				display: flex;
-				flex-direction: column;
-				align-items: center;
-				justify-content: center;
-				height: 90vh;
-				text-align: center;
 			}
-
+			.hero-section {
+				text-align: center;
+				margin-bottom: 100px;
+			}
+			/* 呼吸动画十字星 */
+			.mark {
+				color: var(--accent-gold);
+				font-size: 1.5rem;
+				display: inline-block;
+				animation: pulse 4s infinite ease-in-out;
+			}
+			@keyframes pulse {
+				0%, 100% { opacity: 0.3; transform: scale(1); }
+				50% { opacity: 1; transform: scale(1.1); }
+			}
 			h1 {
 				font-family: 'Cinzel', serif;
-				font-size: clamp(3rem, 10vw, 5rem);
-				font-weight: 700;
-				color: #fff;
-				margin: 0;
+				font-size: clamp(2.5rem, 8vw, 4.5rem);
 				letter-spacing: 0.2em;
-				text-transform: uppercase;
-				/* 渐变金边效果 */
-				background: linear-gradient(to bottom, #fff 0%, var(--accent-gold) 100%);
+				margin-top: 20px;
+				background: linear-gradient(to bottom, #fff, #888);
 				-webkit-background-clip: text;
 				-webkit-text-fill-color: transparent;
 			}
 
-			.subtitle {
-				font-family: 'Cinzel', serif;
-				color: var(--accent-gold);
-				letter-spacing: 0.5em;
-				font-size: 0.8rem;
-				margin-top: 2rem;
-				opacity: 0.8;
+			.altar-grid {
+				display: grid;
+				grid-template-columns: repeat(3, 1fr);
+				gap: 30px;
 			}
 
-			@media (max-width: 768px) {
-				#cursor-light { display: none; }
+			.temple-card {
+				background: rgba(20, 20, 20, 0.6);
+				border: 1px solid rgba(255, 255, 255, 0.05);
+				padding: 80px 30px;
+				text-align: center;
+				text-decoration: none;
+				transition: all 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+				backdrop-filter: blur(5px);
 			}
+
+			.temple-card:hover {
+				transform: translateY(-15px) scale(1.02);
+				border-color: rgba(255, 255, 255, 0.15);
+				background: rgba(30, 30, 30, 0.8);
+			}
+
+			.temple-card h2 { font-family: 'Cinzel', serif; font-size: 1.6rem; letter-spacing: 0.2em; margin: 20px 0; }
+			.temple-card p { font-family: 'Cormorant Garamond', serif; font-style: italic; color: rgba(255,255,255,0.4); line-height: 1.6; }
+
+			/* 手机端深度优化 */
+			@media (max-width: 800px) {
+				.altar-grid { grid-template-columns: 1fr; }
+				.temple-card { padding: 50px 20px; }
+				.hero-section { margin-bottom: 50px; }
+			}
+
+			.card-writing:hover h2 { color: var(--ivory); }
+			.card-gallery:hover h2 { color: var(--silver); }
+			.card-with-you:hover h2 { color: var(--accent-gold); }
 		</style>
 	</head>
 	<body>
-		<div id="cursor-light"></div>
 		<Header />
 		<main>
-			<h1 data-astro-cid-3ef6ksr2>Hello, Buer!</h1>
-			<p class="subtitle">NEMU · ARCHIVE · 2026</p>
+			<div class="hero-section">
+				<span class="mark">✠</span>
+				<h1>NEMU · ARCHIVE</h1>
+			</div>
+			<div class="altar-grid">
+				<a href="/writing" class="temple-card card-writing"><h2>WRITING</h2><p>“ 在墨痕的间隙，捕捉灵魂碎裂的低语。”</p></a>
+				<a href="/gallery" class="temple-card card-gallery"><h2>GALLERY</h2><p>“ 光影的残像，是时间在这个世界留下的唯一证词。”</p></a>
+				<a href="/with-you" class="temple-card card-with-you"><h2>WITH YOU</h2><p>“ 跨越禁忌的边界，于虚无中与你同频。”</p></a>
+			</div>
 		</main>
 		<Footer />
-
-		<script>
-			// 恢复鼠标跟随逻辑
-			const light = document.getElementById('cursor-light');
-			document.addEventListener('mousemove', (e) => {
-				if (light) {
-					light.style.left = e.clientX + 'px';
-					light.style.top = e.clientY + 'px';
-				}
-			});
-		</script>
 	</body>
 </html>
