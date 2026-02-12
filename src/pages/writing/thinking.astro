@@ -1,63 +1,37 @@
 ---
-import BaseHead from "../../components/BaseHead.astro";
-import Header from "../../components/Header.astro";
-import Footer from "../../components/Footer.astro";
-import { getCollection } from "astro:content";
+import { getCollection } from 'astro:content';
+import BaseHead from '../components/BaseHead.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
 
-const pageTitle = "Writing · 思考";
-const heading = "思考";
-const description = "观念、推演与自问自答。";
+// 【关键修改点】根据页面不同，把 'essays' 改成 'poems'、'thinking' 或 'goals'
+const collectionName = 'goals'; 
+const posts = await getCollection(collectionName, ({ data }) => !data.draft);
+const sortedPosts = posts.sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
 
-const posts = (await getCollection("thinking"))
-  .filter((p) => !p.data.draft)
-  .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
+const title = "nemu · " + collectionName;
 ---
 
-<BaseHead title={pageTitle} description={description} />
-<Header />
-
-<main class="wrap">
-  <a class="back" href="/writing">← Writing</a>
-
-  <header class="top">
-    <h1>{heading}</h1>
-    <p class="sub">{description}</p>
-  </header>
-
-  <section class="list">
-    {posts.length === 0 ? (
-      <p class="meta">
-        （这里还没有内容）请确认文件在 <code>src/content/thinking/</code> 下，且 frontmatter 有 <code>title</code> 与 <code>pubDate</code>。
-      </p>
-    ) : (
-      posts.map((p) => (
-        <a class="item" href={`/writing/thinking/${p.slug}/`}>
-          <div class="t">{p.data.title}</div>
-          {p.data.description && <div class="d">{p.data.description}</div>}
-          <div class="meta">{p.data.pubDate.toISOString().slice(0, 10)}</div>
-        </a>
-      ))
-    )}
-  </section>
-</main>
-
-<Footer />
-
-<style>
-  .wrap { max-width: 1100px; margin: 0 auto; padding: 56px 20px; }
-  .back { display:inline-block; margin-bottom: 18px; opacity:.85; text-decoration:none; }
-  .back:hover { opacity: 1; }
-  .top h1 { margin:0; letter-spacing:.02em; }
-  .sub { opacity:.82; margin-top:10px; }
-  .list { display:flex; flex-direction:column; gap:12px; margin-top:18px; }
-  .item {
-    display:block; padding:14px 16px;
-    border:1px solid rgba(255,255,255,.14);
-    border-radius:16px; background:#ffffff05;
-    text-decoration:none; color:inherit;
-  }
-  .item:hover { border-color: rgba(214,178,94,.65); }
-  .t { font-weight:700; }
-  .d { opacity:.75; margin-top:6px; line-height:1.6; }
-  .meta { opacity:.65; font-size:.92rem; margin-top:6px; }
-</style>
+<html lang="en">
+  <head><BaseHead title={title} description="Archive" /></head>
+  <body>
+    <Header />
+    <main class="wrap" style="max-width: 800px; margin: 80px auto; padding: 20px;">
+      <h1 style="font-family: var(--font-display); text-transform: capitalize;">{collectionName}</h1>
+      <ul style="list-style: none; padding: 0;">
+        {sortedPosts.map(post => (
+          <li style="margin-bottom: 2rem; border-bottom: 1px dashed rgba(255,255,255,0.1); padding-bottom: 1rem;">
+            <a href={`/${collectionName}/${post.id}/`} style="text-decoration: none; color: inherit;">
+              <h2 style="font-family: var(--font-display); color: #d6b25e;">{post.data.title}</h2>
+              <p style="opacity: 0.7;">{post.data.description}</p>
+              <span style="font-family: var(--font-mono); font-size: 0.8rem; opacity: 0.5;">
+                {post.data.pubDate.toLocaleDateString()}
+              </span>
+            </a>
+          </li>
+        ))}
+      </ul>
+    </main>
+    <Footer />
+  </body>
+</html>
