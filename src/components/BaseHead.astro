@@ -1,45 +1,68 @@
 ---
-interface Props {
-	title: string;
-	description: string;
-	image?: string;
-}
-const canonicalURL = new URL(Astro.url.pathname, Astro.site);
-const { title, description, image = '/blog-placeholder-1.jpg' } = Astro.props;
-
-// 引入全局视图过渡组件
 import { ClientRouter } from 'astro:transitions';
+const { title, description } = Astro.props;
 ---
-
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-<meta name="generator" content={Astro.generator} />
-
-<link rel="canonical" href={canonicalURL} />
-
 <title>{title}</title>
-<meta name="title" content={title} />
 <meta name="description" content={description} />
-
-<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=EB+Garamond:ital,wght@0,400;1,400&display=swap" rel="stylesheet">
-
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=EB+Garamond:ital,wght@0,400;1,400&family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
 <ClientRouter />
 
 <style is:global>
-	:root {
-		--bg-dark: #0a0a0a;
-		--accent-gold: #d6b25e;
-	}
-	body {
-		background-color: var(--bg-dark);
-		color: #e0e0e0;
-		font-family: 'EB Garamond', serif;
-		margin: 0;
-	}
-	/* 自定义平滑过渡动画：烟雾感 */
-	::view-transition-old(root),
-	::view-transition-new(root) {
-		animation-duration: 0.8s;
-	}
+  :root {
+    --bg-dark: #0a0a0a;
+    --accent-gold: #d2c3a0;
+    --ivory: #f0ebdc;
+    --silver: #e1e5e9;
+  }
+
+  body {
+    background-color: var(--bg-dark);
+    color: #e0e0e0;
+    font-family: 'EB Garamond', serif;
+    margin: 0;
+    overflow-x: hidden;
+  }
+
+  /* 隐藏的设计细节 2：全局背景噪点 */
+  body::before {
+    content: "";
+    position: fixed;
+    top: 0; left: 0; width: 100vw; height: 100vh;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+    opacity: 0.04;
+    pointer-events: none;
+    z-index: 9999;
+  }
+
+  /* 隐藏的设计细节 1：鼠标跟随微光 (Shadow Cursor) */
+  #cursor-light {
+    position: fixed;
+    top: 0; left: 0;
+    width: 600px; height: 600px;
+    background: radial-gradient(circle, rgba(210, 195, 160, 0.06) 0%, transparent 70%);
+    border-radius: 50%;
+    pointer-events: none;
+    transform: translate(-50%, -50%);
+    z-index: 0;
+    transition: opacity 0.5s ease;
+  }
+
+  @media (max-width: 768px) {
+    #cursor-light { display: none; } /* 手机端关闭微光节省性能 */
+  }
 </style>
+
+<div id="cursor-light"></div>
+
+<script>
+  // 鼠标微光逻辑
+  const light = document.getElementById('cursor-light');
+  document.addEventListener('mousemove', (e) => {
+    if (light) {
+      light.style.left = e.clientX + 'px';
+      light.style.top = e.clientY + 'px';
+    }
+  });
+</script>
