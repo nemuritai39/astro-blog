@@ -5,14 +5,10 @@ import Header from '../../components/Header.astro';
 import Footer from '../../components/Footer.astro';
 import { SITE_TITLE } from '../../consts';
 
-// 1. 获取数据，并增加容错处理
 const allMoments = await getCollection('with-you');
-const moments = allMoments ? allMoments.sort(
-	(a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf()
-) : [];
+const moments = allMoments ? allMoments.sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf()) : [];
 
-// 2. 这里设定你的最终密码
-const PASSWORD = "ghyzhy060309060126"; 
+const PASSWORD = "你的密码"; 
 ---
 
 <!doctype html>
@@ -20,78 +16,69 @@ const PASSWORD = "ghyzhy060309060126";
 	<head>
 		<BaseHead title={`With You - ${SITE_TITLE}`} />
 		<style>
-			/* 强力重置背景 */
 			:root { --gold: #d6b25e; }
-			html, body { background: #050505 !important; color: #fff; margin: 0; padding: 0; overflow-x: hidden; }
-
-			/* 极简密码锁 */
+			html, body { background: #050505 !important; color: #fff; margin: 0; padding: 0; }
+			
+			/* 密码门 */
 			#gate {
-				position: fixed;
-				inset: 0;
-				background: #050505;
-				z-index: 10001;
-				display: flex;
-				flex-direction: column;
-				align-items: center;
-				justify-content: center;
-				transition: opacity 0.8s ease, visibility 0.8s;
+				position: fixed; inset: 0; background: #050505; z-index: 10001;
+				display: flex; flex-direction: column; align-items: center; justify-content: center;
+				transition: opacity 0.8s ease;
 			}
-			#gate.hidden { opacity: 0; visibility: hidden; pointer-events: none; }
-
+			#gate.hidden { opacity: 0; visibility: hidden; }
 			#pw-box {
-				background: transparent;
-				border: none;
-				border-bottom: 1px solid rgba(214, 178, 94, 0.4);
-				color: #fff;
-				text-align: center;
-				font-family: 'Cinzel', serif;
-				font-size: 1.8rem;
-				width: 200px;
-				outline: none;
-				letter-spacing: 0.2em;
+				background: transparent; border: none; border-bottom: 1px solid var(--gold);
+				color: #fff; text-align: center; font-family: 'Cinzel', serif; font-size: 1.8rem;
+				width: 200px; outline: none;
 			}
-			#gate p { font-family: 'Cinzel'; font-size: 0.6rem; letter-spacing: 0.4em; color: var(--gold); margin-bottom: 2rem; opacity: 0.6; }
 
 			/* 内容主体 */
 			main { 
-				max-width: 850px; 
-				margin: 0 auto; 
-				padding: 180px 24px; 
-				min-height: 100vh;
-				opacity: 0;
-				filter: blur(20px);
-				transition: all 1.5s ease;
+				max-width: 850px; margin: 0 auto; padding: 180px 24px; 
+				opacity: 0; filter: blur(20px); transition: 1.5s ease; 
 			}
 			main.revealed { opacity: 1; filter: blur(0); }
 
-			/* 时间线 */
-			.timeline-line {
-				position: absolute;
-				left: 50%;
-				top: 180px;
-				bottom: 100px;
-				width: 1px;
-				background: linear-gradient(to bottom, transparent, rgba(214, 178, 94, 0.2) 10%, rgba(214, 178, 94, 0.2) 90%, transparent);
-				z-index: -1;
-			}
+			.moment-card { margin-bottom: 12rem; display: flex; flex-direction: column; align-items: center; text-align: center; }
+			.date { font-family: 'Cinzel'; color: var(--gold); margin-bottom: 2rem; border: 1px solid rgba(214,178,94,0.3); padding: 5px 15px; }
+			
+            /* 修正刚才那个 width: 错误 */
+            .moment-card img { width: 100%; height: auto; max-height: 70vh; object-fit: contain; margin-bottom: 2rem; }
+			
+            h2 { font-family: 'Cinzel'; margin-bottom: 1rem; }
+			p { color: rgba(255,255,255,0.5); font-style: italic; line-height: 1.8; }
+		</style>
+	</head>
+	<body>
+		<div id="gate">
+			<p style="font-family: Cinzel; letter-spacing: 0.5em; color: #d6b25e; opacity: 0.6; margin-bottom: 2rem;">PASSCODE</p>
+			<input type="password" id="pw-box" autofocus />
+		</div>
 
-			.moment-card {
-				margin-bottom: 12rem;
-				display: flex;
-				flex-direction: column;
-				align-items: center;
-				text-align: center;
-			}
+		<Header />
+		<main id="main-content">
+			{moments.map((m) => (
+				<div class="moment-card">
+					<div class="date">{m.data.pubDate.toDateString()}</div>
+					<img src={m.data.cover} alt={m.data.title} />
+					<h2>{m.data.title}</h2>
+					<p>{m.data.description}</p>
+				</div>
+			))}
+		</main>
+		<Footer />
 
-			.date {
-				font-family: 'Cinzel';
-				color: var(--gold);
-				font-size: 0.75rem;
-				letter-spacing: 0.3em;
-				margin-bottom: 3rem;
-				border: 1px solid rgba(214, 178, 94, 0.15);
-				padding: 5px 15px;
-			}
+		<script define:vars={{ PASSWORD }}>
+			const gate = document.getElementById('gate');
+			const input = document.getElementById('pw-box');
+			const main = document.getElementById('main-content');
 
-			.moment-card img {
-				width:
+			input.addEventListener('input', (e) => {
+				if (e.target.value === PASSWORD) {
+					gate.classList.add('hidden');
+					main.classList.add('revealed');
+				}
+			});
+		</script>
+	</body>
+</html>
