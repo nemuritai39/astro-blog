@@ -5,9 +5,11 @@ import Header from '../../components/Header.astro';
 import Footer from '../../components/Footer.astro';
 import { SITE_TITLE } from '../../consts';
 
+// 1. 获取数据逻辑
 const allMoments = await getCollection('with-you');
 const moments = allMoments ? allMoments.sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf()) : [];
 
+// 2. 这里的密码你记得改
 const PASSWORD = "ghyzhy060309060126"; 
 ---
 
@@ -16,56 +18,80 @@ const PASSWORD = "ghyzhy060309060126";
 	<head>
 		<BaseHead title={`With You - ${SITE_TITLE}`} />
 		<style>
-			:root { --gold: #d6b25e; }
-			html, body { background: #050505 !important; color: #fff; margin: 0; padding: 0; }
-			
-			/* 密码门 */
-			#gate {
-				position: fixed; inset: 0; background: #050505; z-index: 10001;
-				display: flex; flex-direction: column; align-items: center; justify-content: center;
-				transition: opacity 0.8s ease;
-			}
-			#gate.hidden { opacity: 0; visibility: hidden; }
-			#pw-box {
-				background: transparent; border: none; border-bottom: 1px solid var(--gold);
-				color: #fff; text-align: center; font-family: 'Cinzel', serif; font-size: 1.8rem;
-				width: 200px; outline: none;
-			}
+			:root { --gold: #d6b25e; --bg: #050505; }
+			html, body { background: var(--bg) !important; color: #fff; margin: 0; padding: 0; overflow-x: hidden; }
 
-			/* 内容主体 */
+			/* --- 密码门特效 --- */
+			#gate {
+				position: fixed; inset: 0; background: var(--bg); z-index: 10001;
+				display: flex; flex-direction: column; align-items: center; justify-content: center;
+				transition: all 1.2s cubic-bezier(0.16, 1, 0.3, 1);
+			}
+			#gate::before {
+				content: ''; position: absolute; inset: 0;
+				background: radial-gradient(circle at center, rgba(214, 178, 94, 0.08) 0%, transparent 70%);
+				animation: breathe 4s infinite ease-in-out;
+			}
+			@keyframes breathe {
+				0%, 100% { opacity: 0.3; transform: scale(1); }
+				50% { opacity: 0.8; transform: scale(1.1); }
+			}
+			#gate.hidden { opacity: 0; visibility: hidden; transform: scale(1.1); pointer-events: none; }
+
+			.input-wrapper { position: relative; width: 240px; }
+			#pw-box {
+				background: transparent; border: none; border-bottom: 1px solid rgba(214, 178, 94, 0.2);
+				color: #fff; text-align: center; font-family: 'Cinzel', serif; font-size: 1.8rem;
+				width: 100%; outline: none; padding: 10px 0; letter-spacing: 0.2em; position: relative; z-index: 2;
+			}
+			.input-wrapper::after {
+				content: ''; position: absolute; bottom: 0; left: 0; width: 0; height: 1px;
+				background: var(--gold); box-shadow: 0 0 15px var(--gold); transition: width 0.6s ease;
+			}
+			.input-wrapper:focus-within::after { width: 100%; }
+			#gate p { font-family: 'Cinzel'; letter-spacing: 0.5em; color: var(--gold); font-size: 0.7rem; margin-bottom: 2rem; opacity: 0.6; }
+
+			/* --- 内容主体布局 --- */
 			main { 
-				max-width: 850px; margin: 0 auto; padding: 180px 24px; 
-				opacity: 0; filter: blur(20px); transition: 1.5s ease; 
+				max-width: 800px; margin: 0 auto; padding: 160px 24px; 
+				opacity: 0; filter: blur(30px); transition: all 2s cubic-bezier(0.16, 1, 0.3, 1); 
 			}
 			main.revealed { opacity: 1; filter: blur(0); }
 
-			.moment-card { margin-bottom: 12rem; display: flex; flex-direction: column; align-items: center; text-align: center; }
-			.date { font-family: 'Cinzel'; color: var(--gold); margin-bottom: 2rem; border: 1px solid rgba(214,178,94,0.3); padding: 5px 15px; }
-			
-            /* 修正刚才那个 width: 错误 */
-            .moment-card img { width: 100%; height: auto; max-height: 70vh; object-fit: contain; margin-bottom: 2rem; }
-			
-            h2 { font-family: 'Cinzel'; margin-bottom: 1rem; }
-			p { color: rgba(255,255,255,0.5); font-style: italic; line-height: 1.8; }
+			.moment-card { margin-bottom: 12rem; display: flex; flex-direction: column; align-items: center; text-align: center; position: relative; }
+			.date { font-family: 'Cinzel'; color: var(--gold); font-size: 0.8rem; letter-spacing: 0.3em; margin-bottom: 3rem; border: 1px solid rgba(214, 178, 94, 0.2); padding: 5px 20px; }
+			.moment-card img { width: 100%; height: auto; max-height: 75vh; object-fit: contain; margin-bottom: 3rem; box-shadow: 0 40px 100px rgba(0,0,0,0.7); }
+			h2 { font-family: 'Cinzel'; font-size: 1.5rem; margin-bottom: 1.5rem; color: #fff; font-weight: 400; }
+			p.desc { font-family: 'Cormorant Garamond', serif; font-size: 1.2rem; color: rgba(255,255,255,0.5); line-height: 1.8; font-style: italic; max-width: 600px; }
 		</style>
 	</head>
 	<body>
 		<div id="gate">
-			<p style="font-family: Cinzel; letter-spacing: 0.5em; color: #d6b25e; opacity: 0.6; margin-bottom: 2rem;">PASSCODE</p>
-			<input type="password" id="pw-box" autofocus />
+			<p>IDENTITY VERIFICATION</p>
+			<div class="input-wrapper">
+				<input type="password" id="pw-box" autofocus />
+			</div>
 		</div>
 
 		<Header />
+		
 		<main id="main-content">
-			{moments.map((m) => (
-				<div class="moment-card">
-					<div class="date">{m.data.pubDate.toDateString()}</div>
-					<img src={m.data.cover} alt={m.data.title} />
-					<h2>{m.data.title}</h2>
-					<p>{m.data.description}</p>
+			{moments.length > 0 ? (
+				moments.map((m) => (
+					<div class="moment-card">
+						<div class="date">{m.data.pubDate.toDateString()}</div>
+						<img src={m.data.cover} alt={m.data.title} />
+						<h2>{m.data.title}</h2>
+						<p class="desc">{m.data.description}</p>
+					</div>
+				))
+			) : (
+				<div style="text-align:center; font-family:Cinzel; opacity:0.5; padding-top:100px;">
+					No memories found. Check src/content/with-you/
 				</div>
-			))}
+			)}
 		</main>
+
 		<Footer />
 
 		<script define:vars={{ PASSWORD }}>
@@ -77,6 +103,7 @@ const PASSWORD = "ghyzhy060309060126";
 				if (e.target.value === PASSWORD) {
 					gate.classList.add('hidden');
 					main.classList.add('revealed');
+					input.blur();
 				}
 			});
 		</script>
