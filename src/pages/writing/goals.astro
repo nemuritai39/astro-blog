@@ -1,36 +1,56 @@
 ---
 import { getCollection } from 'astro:content';
-import BaseHead from '../components/BaseHead.astro';
-import Header from '../components/Header.astro';
-import Footer from '../components/Footer.astro';
+import BaseHead from "../components/BaseHead.astro";
+import Header from "../components/Header.astro";
+import Footer from "../components/Footer.astro";
 
-// 【关键修改点】根据页面不同，把 'essays' 改成 'poems'、'thinking' 或 'goals'
+// 【修改点】如果是诗歌页，就改为 'goals'，以此类推
 const collectionName = 'goals'; 
 const posts = await getCollection(collectionName, ({ data }) => !data.draft);
 const sortedPosts = posts.sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
 
-const title = "nemu · " + collectionName;
+const pageTitle = `nemu · ${collectionName}`;
 ---
 
 <html lang="en">
-  <head><BaseHead title={title} description="Archive" /></head>
+  <head>
+    <BaseHead title={pageTitle} description="Archive" />
+    <style>
+      /* 这里 100% 保留你原本在 gallery.astro 或 essays.astro 里的所有 CSS */
+      .wrap { max-width: 1100px; margin: 0 auto; padding: 68px 20px; }
+      .hero { position: relative; padding: 16px 0 34px; margin-bottom: 22px; }
+      .hero::before { content: "✠"; position: absolute; left: 0; top: -6px; font-size: 22px; color: rgba(214,178,94,.75); }
+      .hero h1 { margin: 0; font-family: var(--font-display); font-size: clamp(44px, 6vw, 64px); }
+      .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 18px; margin-top: 30px; }
+      @media (max-width: 768px) { .grid { grid-template-columns: 1fr; } }
+      .card { position: relative; border-radius: 22px; background: rgba(255,255,255,.05); border: 1px solid rgba(255,255,255,.14); padding: 30px; transition: 0.2s; }
+      .card:hover { border-color: rgba(214,178,94,.55); transform: translateY(-2px); }
+      .t { font-family: var(--font-display); font-size: 1.8rem; color: #d6b25e; margin-bottom: 10px; }
+      .stud { position: absolute; width: 8px; height: 8px; background: #d6b25e; transform: rotate(45deg); border-radius: 1px; }
+      .s-tl { top: 15px; left: 15px; } .s-tr { top: 15px; right: 15px; }
+    </style>
+  </head>
   <body>
     <Header />
-    <main class="wrap" style="max-width: 800px; margin: 80px auto; padding: 20px;">
-      <h1 style="font-family: var(--font-display); text-transform: capitalize;">{collectionName}</h1>
-      <ul style="list-style: none; padding: 0;">
-        {sortedPosts.map(post => (
-          <li style="margin-bottom: 2rem; border-bottom: 1px dashed rgba(255,255,255,0.1); padding-bottom: 1rem;">
-            <a href={`/${collectionName}/${post.id}/`} style="text-decoration: none; color: inherit;">
-              <h2 style="font-family: var(--font-display); color: #d6b25e;">{post.data.title}</h2>
-              <p style="opacity: 0.7;">{post.data.description}</p>
-              <span style="font-family: var(--font-mono); font-size: 0.8rem; opacity: 0.5;">
+    <main class="wrap">
+      <section class="hero">
+        <h1 style="text-transform: capitalize;">{collectionName}</h1>
+        <div class="divider" style="height:1px; background:linear-gradient(90deg,transparent,#d6b25e,transparent); margin: 20px 0;"></div>
+      </section>
+      <div class="grid">
+        {sortedPosts.map((post) => (
+          <a href={`/${collectionName}/${post.id}/`} style="text-decoration: none; color: inherit;">
+            <article class="card">
+              <span class="stud s-tl"></span><span class="stud s-tr"></span>
+              <div class="t">{post.data.title}</div>
+              <p style="opacity: 0.7; line-height: 1.6;">{post.data.description}</p>
+              <div style="margin-top: 15px; font-family: var(--font-mono); font-size: 12px; opacity: 0.4;">
                 {post.data.pubDate.toLocaleDateString()}
-              </span>
-            </a>
-          </li>
+              </div>
+            </article>
+          </a>
         ))}
-      </ul>
+      </div>
     </main>
     <Footer />
   </body>
