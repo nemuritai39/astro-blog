@@ -54,9 +54,9 @@ import { SITE_TITLE, SITE_DESCRIPTION } from '../consts';
 			/* 通用卡片基础 */
 			.temple-card {
 				position: relative;
-				background: linear-gradient(145deg, rgba(20,20,25,0.9), rgba(5,5,8,0.98));
+				background: linear-gradient(145deg, rgba(20,20,20,0.9), rgba(10,10,10,0.95));
 				border: 1px solid rgba(255, 255, 255, 0.05);
-				border-radius: 4px;
+				border-radius: 2px; /* 极小的圆角，更像石碑 */
 				padding: 60px 30px;
 				text-align: center;
 				text-decoration: none;
@@ -68,58 +68,64 @@ import { SITE_TITLE, SITE_DESCRIPTION } from '../consts';
 			}
 
 			.temple-card:hover {
-				transform: translateY(-10px);
+				transform: translateY(-8px);
+				background: linear-gradient(145deg, rgba(25,25,25,0.95), rgba(15,15,15,1));
 			}
 
 			.temple-card h2 {
 				font-family: 'Cinzel', serif;
-				font-size: 1.8rem;
-				letter-spacing: 0.15em;
+				font-size: 1.7rem;
+				letter-spacing: 0.2em;
 				margin: 20px 0;
-				transition: color 0.4s;
+				transition: all 0.4s;
 			}
 
 			.temple-card p {
 				font-family: 'Cormorant Garamond', serif;
 				font-style: italic;
-				color: rgba(255, 255, 255, 0.4);
-				font-size: 1.1rem;
+				color: rgba(255, 255, 255, 0.35);
+				font-size: 1.05rem;
 				line-height: 1.6;
 				max-width: 240px;
+				transition: color 0.4s;
 			}
 
 			.stud {
-				width: 8px; height: 8px;
+				width: 6px; height: 6px;
 				transform: rotate(45deg);
-				margin-bottom: 10px;
+				margin-bottom: 12px;
 				transition: all 0.4s;
+				background: rgba(255,255,255,0.2);
 			}
 
-			/* --- 三个卡片各自的灵魂色彩 --- */
+			/* --- 不同的金属质感 --- */
 
-			/* 1. Writing - 墨蓝 (Ink Blue) */
+			/* 1. Writing - 晨曦金 (Champagne Gold) */
 			.card-writing:hover {
-				border-color: rgba(70, 130, 180, 0.4);
-				box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), 0 0 20px rgba(70, 130, 180, 0.1);
+				border-color: rgba(247, 231, 206, 0.3);
+				box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6);
 			}
-			.card-writing h2 { color: #a0c4ff; }
-			.card-writing .stud { background: #4682b4; box-shadow: 0 0 10px #4682b4; }
+			.card-writing h2 { color: #f7e7ce; }
+			.card-writing .stud { background: #f7e7ce; box-shadow: 0 0 12px rgba(247, 231, 206, 0.5); }
+            .card-writing:hover p { color: rgba(247, 231, 206, 0.6); }
 
-			/* 2. Gallery - 枯绿 (Moss Green) */
+			/* 2. Gallery - 纯净白 (Alabaster White) */
 			.card-gallery:hover {
-				border-color: rgba(85, 107, 47, 0.4);
-				box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), 0 0 20px rgba(85, 107, 47, 0.1);
+				border-color: rgba(255, 255, 255, 0.3);
+				box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6);
 			}
-			.card-gallery h2 { color: #b7d892; }
-			.card-gallery .stud { background: #556b2f; box-shadow: 0 0 10px #556b2f; }
+			.card-gallery h2 { color: #ffffff; }
+			.card-gallery .stud { background: #ffffff; box-shadow: 0 0 12px rgba(255, 255, 255, 0.4); }
+            .card-gallery:hover p { color: rgba(255, 255, 255, 0.6); }
 
-			/* 3. With You - 暗紫 (Void Purple) */
+			/* 3. With You - 古铜金 (Antique Bronze) */
 			.card-with-you:hover {
-				border-color: rgba(106, 90, 205, 0.4);
-				box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), 0 0 20px rgba(106, 90, 205, 0.1);
+				border-color: rgba(214, 178, 94, 0.3);
+				box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6);
 			}
-			.card-with-you h2 { color: #c3b1e1; }
-			.card-with-you .stud { background: #6a5acd; box-shadow: 0 0 10px #6a5acd; }
+			.card-with-you h2 { color: #d6b25e; }
+			.card-with-you .stud { background: #d6b25e; box-shadow: 0 0 12px rgba(214, 178, 94, 0.5); }
+            .card-with-you:hover p { color: rgba(214, 178, 94, 0.6); }
 
 		</style>
 	</head>
