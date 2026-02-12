@@ -1,7 +1,7 @@
 ---
 import { SITE_TITLE } from '../consts';
 
-// 获取当前路径，用于判断哪个标签是激活状态
+// 获取当前路径
 const { pathname } = Astro.url;
 const isActive = (path: string) => path === pathname || path === pathname.replace(/\/$/, '');
 ---
@@ -16,7 +16,7 @@ const isActive = (path: string) => path === pathname || path === pathname.replac
 				<a href="/" class={isActive('/') ? 'active' : ''}>Index</a>
 				<a href="/writing" class={isActive('/writing') ? 'active' : ''}>Writing</a>
 				<a href="/gallery" class={isActive('/gallery') ? 'active' : ''}>Gallery</a>
-				<a href="/about" class={isActive('/about') ? 'active' : ''}>About</a>
+				<a href="/with-you" class={isActive('/with-you') ? 'active' : ''}>With You</a>
 			</div>
 		</div>
 	</nav>
@@ -29,7 +29,7 @@ const isActive = (path: string) => path === pathname || path === pathname.replac
 		left: 0;
 		width: 100%;
 		z-index: 1000;
-		background: rgba(0, 0, 0, 0.3); /* 初始微弱背景，确保可见 */
+		background: rgba(0, 0, 0, 0.3);
 		backdrop-filter: blur(0px);
 		transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
 		padding: 35px 0;
@@ -37,7 +37,7 @@ const isActive = (path: string) => path === pathname || path === pathname.replac
 
 	header.scrolled {
 		padding: 18px 0;
-		background: rgba(10, 10, 10, 0.8);
+		background: rgba(10, 10, 10, 0.85);
 		backdrop-filter: blur(20px);
 		border-bottom: 1px solid rgba(214, 178, 94, 0.2);
 	}
@@ -69,27 +69,20 @@ const isActive = (path: string) => path === pathname || path === pathname.replac
 		gap: 3rem;
 	}
 
-	/* 重点：强制让标签显示的样式 */
 	.internal-links a {
 		display: inline-block;
 		font-family: 'Cinzel', serif;
 		font-size: 0.8rem;
 		text-transform: uppercase;
 		letter-spacing: 0.2em;
-		color: rgba(255, 255, 255, 0.6); /* 没选中的时候是淡灰色 */
+		color: rgba(255, 255, 255, 0.5);
 		text-decoration: none;
 		position: relative;
 		transition: all 0.3s ease;
 		padding: 5px 0;
 	}
 
-	/* 悬停效果 */
-	.internal-links a:hover {
-		color: #fff;
-		opacity: 1;
-	}
-
-	/* 选中状态（激活态） */
+	.internal-links a:hover,
 	.internal-links a.active {
 		color: var(--accent-gold, #d6b25e);
 		opacity: 1;
@@ -111,18 +104,20 @@ const isActive = (path: string) => path === pathname || path === pathname.replac
 
 	@media (max-width: 768px) {
 		.logo { display: none; }
-		.internal-links { width: 100%; justify-content: center; gap: 1.5rem; }
-		.internal-links a { font-size: 0.7rem; }
+		.internal-links { width: 100%; justify-content: center; gap: 1.2rem; }
+		.internal-links a { font-size: 0.65rem; }
 	}
 </style>
 
 <script>
 	const header = document.getElementById('main-header');
-	window.addEventListener('scroll', () => {
+	const handleScroll = () => {
 		if (window.scrollY > 20) {
 			header?.classList.add('scrolled');
 		} else {
 			header?.classList.remove('scrolled');
 		}
-	});
+	};
+	window.addEventListener('scroll', handleScroll);
+	handleScroll(); // 初始化执行一次
 </script>
