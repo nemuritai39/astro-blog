@@ -1,37 +1,53 @@
 ---
 import { getCollection } from 'astro:content';
+import BaseHead from '../../components/BaseHead.astro';
 import Header from '../../components/Header.astro';
-const moments = await getCollection('with-you');
-const PASSWORD = "你的密码"; 
+import Footer from '../../components/Footer.astro';
+import { SITE_TITLE } from '../../consts';
+
+const moments = (await getCollection('with-you')).sort(
+	(a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf()
+);
+const PASSWORD = "ghyzhy060309060126"; // <--- 记得改这里
 ---
 
-<div id="lock">
-  <input type="password" id="pw" placeholder="输入密码进入" />
-</div>
-
-<Header />
-<main id="timeline">
-  {moments.sort((a,b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf()).map(m => (
-    <div class="moment">
-      <span class="date">{m.data.pubDate.toDateString()}</span>
-      <img src={m.data.cover} />
-      <h2>{m.data.title}</h2>
-      <p>{m.data.description}</p>
-    </div>
-  ))}
-</main>
-
-<style>
-  #lock { position: fixed; inset: 0; background: #000; z-index: 1000; display: flex; align-items: center; justify-content: center; }
-  .unlocked #lock { display: none; }
-  #timeline { padding: 150px 20px; max-width: 600px; margin: 0 auto; }
-  .moment { margin-bottom: 80px; border-left: 2px solid #d6b25e; padding-left: 30px; }
-  .date { color: #d6b25e; font-family: Cinzel; }
-  img { width: 100%; margin: 20px 0; }
-</style>
-
-<script define:vars={{ PASSWORD }}>
-  document.getElementById('pw').addEventListener('input', (e) => {
-    if (e.target.value === PASSWORD) document.body.classList.add('unlocked');
-  });
-</script>
+<!doctype html>
+<html lang="en">
+	<head>
+		<BaseHead title={`With You - ${SITE_TITLE}`} />
+		<style>
+			#gate { position: fixed; inset: 0; background: #050505; z-index: 9999; display: flex; align-items: center; justify-content: center; transition: 1s; }
+			#gate input { background: transparent; border: none; border-bottom: 1px solid #d6b25e; color: #fff; text-align: center; font-family: 'Cinzel'; font-size: 1.5rem; outline: none; padding: 10px; width: 250px; }
+			.unlocked #gate { opacity: 0; visibility: hidden; pointer-events: none; }
+			main { max-width: 800px; margin: 0 auto; padding: 160px 24px; filter: blur(20px); transition: 1.2s; }
+			.unlocked main { filter: blur(0); }
+			.moment { margin-bottom: 12rem; position: relative; text-align: center; }
+			.moment::before { content: ''; position: absolute; left: 50%; top: -6rem; height: 6rem; width: 1px; background: rgba(214,178,94,0.3); }
+			.date-tag { font-family: 'Cinzel'; color: #d6b25e; font-size: 0.8rem; letter-spacing: 0.3em; margin-bottom: 3rem; }
+			.moment img { width: 100%; height: auto; margin-bottom: 3rem; box-shadow: 0 20px 50px rgba(0,0,0,0.5); }
+			.moment h2 { font-family: 'Cinzel'; font-size: 1.5rem; margin-bottom: 1.5rem; color: #fff; }
+			.moment p { font-family: 'Cormorant Garamond', serif; font-size: 1.2rem; color: rgba(255,255,255,0.6); line-height: 1.8; max-width: 600px; margin: 0 auto; }
+		</style>
+	</head>
+	<body>
+		<div id="gate"><input type="password" id="pwd" placeholder="PASSCODE" autofocus /></div>
+		<Header />
+		<main>
+			{moments.map(m => (
+				<div class="moment">
+					<div class="date-tag">{m.data.pubDate.toDateString()}</div>
+					<img src={m.data.cover} />
+					<h2>{m.data.title}</h2>
+					<p>{m.data.description}</p>
+				</div>
+			))}
+		</main>
+		<Footer />
+		<script define:vars={{ PASSWORD }}>
+			const input = document.getElementById('pwd');
+			input.addEventListener('input', (e) => {
+				if (e.target.value === PASSWORD) document.body.classList.add('unlocked');
+			});
+		</script>
+	</body>
+</html>
