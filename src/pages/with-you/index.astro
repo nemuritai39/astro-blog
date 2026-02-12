@@ -5,16 +5,15 @@ import Header from '../../components/Header.astro';
 import Footer from '../../components/Footer.astro';
 import { SITE_TITLE } from '../../consts';
 
-// 1. 获取内容集合
-// 即使某个文件写错了，也不会导致整个数组崩掉
-const rawMoments = await getCollection('with-you');
+// 1. 强力抓取
+let moments = [];
+try {
+    const raw = await getCollection('with-you');
+    moments = raw.sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
+} catch (e) {
+    console.error("抓取失败:", e);
+}
 
-// 2. 排序：按日期从新到旧
-const moments = rawMoments.sort(
-	(a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf()
-);
-
-// 3. 你的专属暗号
 const PASSWORD = "0309"; 
 ---
 
@@ -24,102 +23,44 @@ const PASSWORD = "0309";
 		<BaseHead title={`With You - ${SITE_TITLE}`} />
 		<style>
 			:root { --gold: #d6b25e; --bg: #050505; }
-			html, body { background: var(--bg) !important; color: #fff; margin: 0; padding: 0; }
-			
-			/* 密码锁屏层 */
-			#gate { 
-				position: fixed; 
-				inset: 0; 
-				background: var(--bg); 
-				z-index: 10001; 
-				display: flex; 
-				flex-direction: column; 
-				align-items: center; 
-				justify-content: center; 
-				transition: opacity 0.8s ease, visibility 0.8s;
-			}
-			#gate.hidden { opacity: 0; visibility: hidden; pointer-events: none; }
-			#pw-box { 
-				background: transparent; 
-				border: none; 
-				border-bottom: 1px solid var(--gold); 
-				color: #fff; 
-				text-align: center; 
-				font-size: 1.8rem; 
-				width: 260px; 
-				outline: none; 
-				font-family: 'Cinzel', serif;
-			}
-
-			/* 内容区域 */
-			main { max-width: 800px; margin: 0 auto; padding: 160px 24px; }
-			.memory-card { 
-				margin-bottom: 120px; 
-				display: flex; 
-				flex-direction: column; 
-				align-items: center; 
-				text-align: center; 
-			}
-			.date { 
-				font-family: 'Cinzel', serif; 
-				color: var(--gold); 
-				font-size: 0.9rem; 
-				letter-spacing: 0.3em; 
-				margin-bottom: 2rem; 
-			}
-			.memory-card img { 
-				width: 100%; 
-				height: auto; 
-				max-height: 80vh; 
-				object-fit: contain; 
-				margin-bottom: 2rem; 
-				box-shadow: 0 20px 80px rgba(0,0,0,0.8); 
-			}
-			h2 { font-family: 'Cinzel', serif; font-size: 1.5rem; font-weight: 400; margin: 1rem 0; }
-			.desc { 
-				font-family: 'Cormorant Garamond', serif; 
-				font-size: 1.1rem; 
-				color: rgba(255,255,255,0.6); 
-				font-style: italic; 
-			}
+			body { background: var(--bg); color: #fff; margin: 0; }
+			#gate { position: fixed; inset: 0; background: var(--bg); z-index: 10001; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+			#gate.hidden { display: none; }
+			#pw-box { background: transparent; border: none; border-bottom: 1px solid var(--gold); color: #fff; text-align: center; font-size: 1.8rem; width: 260px; outline: none; }
+			main { max-width: 800px; margin: 0 auto; padding: 150px 20px; }
+			.card { margin-bottom: 100px; text-align: center; }
+			/* 修复裂图的关键：确保图片不溢出且路径正确 */
+			.card img { width: 100%; height: auto; max-height: 70vh; object-fit: contain; margin: 2rem 0; border: 1px solid rgba(214,178,94,0.2); }
 		</style>
 	</head>
 	<body>
 		<div id="gate">
-			<p style="font-family: 'Cinzel'; color: var(--gold); letter-spacing: 0.5em; margin-bottom: 2rem; font-size: 0.8rem;">IDENTITY VERIFICATION</p>
-			<input type="password" id="pw-box" autofocus placeholder="••••" />
+			<input type="password" id="pw-box" autofocus placeholder="PASSCODE" />
 		</div>
 
 		<Header />
-		
-		<main id="main-content">
+		<main>
 			{moments.length > 0 ? (
 				moments.map((m) => (
-					<div class="memory-card">
-						<div class="date">{m.data.pubDate.toDateString()}</div>
-						<img src={m.data.cover} alt={m.data.title} loading="lazy" />
-						<h2>{m.data.title}</h2>
-						{m.data.description && <p class="desc">{m.data.description}</p>}
+					<div class="card">
+						<div style="color:var(--gold); font-family:Cinzel;">{m.data.pubDate.toDateString()}</div>
+						<img src={m.data.cover.startsWith('/') ? m.data.cover : `/${m.data.cover}`} alt={m.data.title} />
+						<h2 style="font-family:Cinzel;">{m.data.title}</h2>
+						<p style="opacity:0.5; font-style:italic;">{m.data.description}</p>
 					</div>
 				))
 			) : (
-				<div style="text-align:center; padding-top:100px; opacity:0.5; font-family: 'Cinzel';">
-					No memories found. Check src/content/with-you/
+				<div style="text-align:center; padding:100px; opacity:0.5;">
+					<p>FOUND: {moments.length}</p>
+					<p>请检查: src/content/with-you/ 是否有 .md</p>
 				</div>
 			)}
 		</main>
-
 		<Footer />
 
 		<script define:vars={{ PASSWORD }}>
-			const gate = document.getElementById('gate');
-			const input = document.getElementById('pw-box');
-			
-			input.addEventListener('input', (e) => {
-				if (e.target.value === PASSWORD) {
-					gate.classList.add('hidden');
-					input.blur();
-				}
+			document.getElementById('pw-box').addEventListener('input', (e) => {
+				if (e.target.value === PASSWORD) document.getElementById('gate').classList.add('hidden');
 			});
 		</script>
 	</body>
