@@ -5,7 +5,7 @@ import Header from '../../components/Header.astro';
 import Footer from '../../components/Footer.astro';
 import { SITE_TITLE } from '../../consts';
 
-// 1. 获取并排序（日期从新到旧）
+// 搬家后 getCollection 已经能用了
 const posts = await getCollection('with-you');
 const sortedPosts = posts.sort(
 	(a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf()
@@ -21,83 +21,42 @@ const PASSWORD = "0309";
 		<style>
 			:root { --gold: #d6b25e; --bg: #050505; }
 			html, body { background: var(--bg) !important; color: #fff; margin: 0; }
-			
-			/* 密码锁屏 */
-			#gate { 
-				position: fixed; inset: 0; background: var(--bg); z-index: 10001; 
-				display: flex; flex-direction: column; align-items: center; justify-content: center; 
-				transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
-			}
-			#gate.hidden { opacity: 0; visibility: hidden; pointer-events: none; transform: translateY(-20px); }
-			#pw-box { 
-				background: transparent; border: none; border-bottom: 1px solid var(--gold); 
-				color: #fff; text-align: center; font-size: 2rem; width: 200px; outline: none; 
-				font-family: 'Cinzel', serif; letter-spacing: 0.2em;
-			}
-
-			/* 响应式布局 */
-			main { max-width: 900px; margin: 0 auto; padding: 160px 24px; }
-			.memory-card { margin-bottom: 150px; text-align: center; opacity: 0; transform: translateY(30px); transition: all 1s ease; }
-			.memory-card.visible { opacity: 1; transform: translateY(0); }
-			
-			.date { font-family: 'Cinzel', serif; color: var(--gold); letter-spacing: 0.3em; font-size: 0.9rem; }
-			
-			.img-container { position: relative; margin: 2.5rem 0; overflow: hidden; border-radius: 4px; }
-			.memory-card img { 
-				width: 100%; height: auto; max-height: 80vh; object-fit: contain;
-				box-shadow: 0 40px 100px rgba(0,0,0,0.7);
-			}
-			
-			h2 { font-family: 'Cinzel', serif; font-size: 1.8rem; font-weight: 400; margin: 1.5rem 0 0.5rem; }
-			.desc { color: rgba(255,255,255,0.4); font-style: italic; font-size: 1.1rem; }
+			#gate { position: fixed; inset: 0; background: var(--bg); z-index: 10001; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+			#gate.hidden { display: none; }
+			#pw-box { background: transparent; border: none; border-bottom: 1px solid var(--gold); color: #fff; text-align: center; font-size: 2rem; width: 200px; outline: none; }
+			main { max-width: 800px; margin: 0 auto; padding: 150px 24px; }
+			.memory-item { margin-bottom: 120px; text-align: center; }
+			.memory-item img { width: 100%; max-height: 75vh; object-fit: contain; margin: 2rem 0; box-shadow: 0 30px 60px rgba(0,0,0,0.5); }
+			.date { color: var(--gold); font-family: 'Cinzel', serif; letter-spacing: 0.2em; }
 		</style>
 	</head>
 	<body>
 		<div id="gate">
-			<p style="color: var(--gold); letter-spacing: 0.5em; font-family: 'Cinzel'; margin-bottom: 2rem; font-size: 0.7rem;">PRIVATE ARCHIVE</p>
-			<input type="password" id="pw-box" autofocus placeholder="••••" />
+			<p style="color: var(--gold); letter-spacing: 0.5em; font-family: 'Cinzel'; margin-bottom: 2rem;">PASSCODE</p>
+			<input type="password" id="pw-box" autofocus />
 		</div>
 
 		<Header />
-		
-		<main id="main-content">
+		<main>
 			{sortedPosts.map((post) => (
-				<section class="memory-card">
+				<div class="memory-item">
 					<div class="date">{post.data.pubDate.toDateString()}</div>
-					<div class="img-container">
-						<img src={post.data.cover} alt={post.data.title} loading="lazy" />
-					</div>
-					<h2>{post.data.title}</h2>
-					{post.data.description && <p class="desc">{post.data.description}</p>}
-				</section>
+					<img src={post.data.cover} alt={post.data.title} />
+					<h2 style="font-family: 'Cinzel';">{post.data.title}</h2>
+					{post.data.description && <p style="opacity:0.5">{post.data.description}</p>}
+				</div>
 			))}
 		</main>
-
 		<Footer />
 
 		<script define:vars={{ PASSWORD }}>
-			// 密码逻辑
 			const gate = document.getElementById('gate');
 			const input = document.getElementById('pw-box');
-			
 			input.addEventListener('input', (e) => {
 				if (e.target.value === PASSWORD) {
 					gate.classList.add('hidden');
-					// 解锁后触发滚动动画
-					reveal();
 				}
 			});
-
-			// 简单的入场动画
-			function reveal() {
-				const cards = document.querySelectorAll('.memory-card');
-				cards.forEach((card, i) => {
-					setTimeout(() => card.classList.add('visible'), i * 200);
-				});
-			}
-			
-			// 如果已经解锁（刷新页面），自动运行
-			if (gate.classList.contains('hidden')) reveal();
 		</script>
 	</body>
 </html>
