@@ -3,7 +3,7 @@ import HeaderLink from './HeaderLink.astro';
 import { SITE_TITLE } from '../consts';
 ---
 
-<header>
+<header id="main-header">
 	<nav>
 		<div class="nav-container">
 			<div class="logo">
@@ -23,24 +23,30 @@ import { SITE_TITLE } from '../consts';
 	header {
 		position: fixed;
 		top: 0;
+		left: 0;
 		width: 100%;
 		z-index: 1000;
-		transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
-		padding: 30px 0; /* 初始间距 */
+		/* 初始状态：半透明深色，带有一条极细的底线 */
+		background: rgba(0, 0, 0, 0.2);
+		backdrop-filter: blur(0px);
+		border-bottom: 1px solid rgba(255, 255, 255, 0);
+		transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+		padding: 40px 0;
 	}
 
-	/* 滚动后的状态由 JS 控制添加 .scrolled 类 */
+	/* 滚动后的“凝固”状态 */
 	header.scrolled {
-		padding: 15px 0;
-		background: rgba(0, 0, 0, 0.6);
-		backdrop-filter: blur(12px); /* 毛玻璃效果 */
-		border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+		padding: 18px 0;
+		background: rgba(10, 10, 10, 0.8);
+		backdrop-filter: blur(20px);
+		border-bottom: 1px solid rgba(214, 178, 94, 0.2); /* 淡淡的金边 */
+		box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
 	}
 
 	nav {
-		max-width: 1400px;
+		max-width: 1200px;
 		margin: 0 auto;
-		padding: 0 40px;
+		padding: 0 30px;
 	}
 
 	.nav-container {
@@ -51,75 +57,78 @@ import { SITE_TITLE } from '../consts';
 
 	.logo a {
 		font-family: 'Cinzel', serif;
-		font-size: 1.1rem;
+		font-size: 0.9rem;
 		font-weight: 700;
-		color: var(--ivory);
+		color: #fff;
 		text-decoration: none;
-		letter-spacing: 0.2em;
-		transition: opacity 0.3s ease;
-	}
-
-	.logo a:hover {
-		opacity: 0.7;
+		letter-spacing: 0.3em;
+		text-transform: uppercase;
+		opacity: 0.9;
 	}
 
 	.internal-links {
 		display: flex;
-		gap: 3rem;
+		gap: 3.5rem;
 	}
 
-	/* 针对 HeaderLink 的样式增强 */
+	/* 导航链接：确保可见度 */
 	.internal-links :global(a) {
 		font-family: 'Cinzel', serif;
 		font-size: 0.75rem;
 		text-transform: uppercase;
-		letter-spacing: 0.3em;
-		color: var(--ivory);
+		letter-spacing: 0.2em;
+		color: rgba(255, 255, 255, 0.6); /* 初始灰色 */
 		text-decoration: none;
-		opacity: 0.4;
-		padding: 10px 0;
 		position: relative;
-		transition: all 0.4s ease;
+		transition: all 0.3s ease;
+		padding: 5px 0;
 	}
 
+	/* 悬停和激活状态 */
 	.internal-links :global(a:hover),
 	.internal-links :global(a.active) {
+		color: var(--accent-gold, #d6b25e);
 		opacity: 1;
-		color: var(--accent-gold);
 	}
 
-	/* 极简下划线动画 */
-	.internal-links :global(a::after) {
+	/* 激活状态的小原点（比下划线更显灵性） */
+	.internal-links :global(a.active::after) {
 		content: '';
 		position: absolute;
-		bottom: 0;
-		left: 0;
-		width: 0;
-		height: 1px;
-		background: var(--accent-gold);
-		transition: width 0.4s ease;
+		bottom: -8px;
+		left: 50%;
+		transform: translateX(-50%);
+		width: 4px;
+		height: 4px;
+		background: var(--accent-gold, #d6b25e);
+		border-radius: 50%;
+		box-shadow: 0 0 10px var(--accent-gold);
 	}
 
-	.internal-links :global(a:hover::after),
-	.internal-links :global(a.active::after) {
-		width: 100%;
-	}
-
-	@media (max-width: 720px) {
-		header { padding: 20px 0; }
-		.internal-links { gap: 1.5rem; }
-		.logo { display: none; } /* 移动端隐藏 Logo 以腾出空间 */
-		.internal-links { width: 100%; justify-content: center; }
+	@media (max-width: 768px) {
+		header { padding: 25px 0; }
+		.logo { display: none; }
+		.internal-links { width: 100%; justify-content: space-around; gap: 0; }
 	}
 </style>
 
 <script>
-	const header = document.querySelector('header');
-	window.addEventListener('scroll', () => {
-		if (window.scrollY > 50) {
-			header?.classList.add('scrolled');
-		} else {
-			header?.classList.remove('scrolled');
-		}
-	});
+	// 确保在 Astro 页面切换时也能重新执行
+	const initHeader = () => {
+		const header = document.getElementById('main-header');
+		const handleScroll = () => {
+			if (window.scrollY > 20) {
+				header?.classList.add('scrolled');
+			} else {
+				header?.classList.remove('scrolled');
+			}
+		};
+		window.addEventListener('scroll', handleScroll);
+		// 初始执行一次
+		handleScroll();
+	};
+
+	initHeader();
+	// 针对 Astro 的视图过渡（如果开启了的话）
+	document.addEventListener('astro:after-swap', initHeader);
 </script>
