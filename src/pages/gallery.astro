@@ -1,174 +1,26 @@
 ---
 import { getCollection } from 'astro:content';
-import BaseHead from '../components/BaseHead.astro';
-import Header from '../components/Header.astro';
-import Footer from '../components/Footer.astro';
-import { SITE_TITLE } from '../consts';
+import BaseLayout from '../layouts/BaseLayout.astro'; // 或者你之前的 Layout
 
-// 抓取并按时间排序
-const photos = (await getCollection('gallery')).sort(
-	(a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf()
-);
+// 只抓取 gallery 文件夹里的内容
+const photos = await getCollection('gallery');
 ---
 
-<!doctype html>
-<html lang="en">
-	<head>
-		<BaseHead title={`Gallery - ${SITE_TITLE}`} description="光影的切片" />
-		<style>
-			main { 
-				max-width: 1400px; 
-				margin: 0 auto; 
-				padding: 140px 24px; 
-			}
+<BaseLayout>
+  <main>
+    <div class="grid">
+      {photos.map(photo => (
+        <div class="item">
+          <img src={photo.data.cover} alt={photo.data.title} />
+          <p>{photo.data.title}</p>
+        </div>
+      ))}
+    </div>
+  </main>
+</BaseLayout>
 
-			/* 12列栅格实现非对称布局 */
-			.gallery-container {
-				display: grid;
-				grid-template-columns: repeat(12, 1fr);
-				gap: 120px 30px;
-				align-items: start;
-			}
-
-			.photo-card {
-				position: relative;
-				grid-column: span 12;
-				transition: transform 1.2s cubic-bezier(0.16, 1, 0.3, 1);
-				cursor: zoom-in;
-			}
-
-			/* 桌面端错落排版逻辑 */
-			@media (min-width: 1024px) {
-				.photo-card:nth-child(4n+1) { grid-column: 2 / span 4; } 
-				.photo-card:nth-child(4n+2) { grid-column: 7 / span 5; margin-top: 150px; }
-				.photo-card:nth-child(4n+3) { grid-column: 1 / span 5; }
-				.photo-card:nth-child(4n+4) { grid-column: 7 / span 4; margin-top: -80px; }
-			}
-
-			.image-wrapper {
-				position: relative;
-				overflow: hidden;
-				background: #0a0a0a;
-			}
-
-			.photo-card img {
-				width: 100%;
-				height: auto;
-				display: block;
-				filter: grayscale(20%) brightness(0.9) contrast(0.9);
-				transition: all 1.5s cubic-bezier(0.16, 1, 0.3, 1);
-			}
-
-			.photo-card:hover img {
-				filter: grayscale(0%) brightness(1) contrast(1);
-				transform: scale(1.02);
-			}
-
-			/* 底部信息栏 */
-			.photo-meta {
-				margin-top: 1.5rem;
-				opacity: 0;
-				transform: translateY(10px);
-				transition: all 0.8s ease;
-			}
-
-			.photo-card:hover .photo-meta {
-				opacity: 0.8;
-				transform: translateY(0);
-			}
-
-			.photo-meta h3 {
-				font-family: 'Cinzel', serif;
-				font-size: 0.75rem;
-				letter-spacing: 0.4em;
-				color: var(--accent-gold, #d6b25e);
-				margin: 0;
-				text-transform: uppercase;
-			}
-
-			.photo-meta p {
-				font-family: 'Cormorant Garamond', serif;
-				font-style: italic;
-				font-size: 1rem;
-				color: rgba(255, 255, 255, 0.5);
-				margin-top: 8px;
-				line-height: 1.4;
-			}
-
-			/* --- 灯箱 (Lightbox) --- */
-			#lightbox {
-				position: fixed;
-				top: 0; left: 0; width: 100%; height: 100%;
-				background: rgba(0, 0, 0, 0.98);
-				display: flex; align-items: center; justify-content: center;
-				z-index: 10000; opacity: 0; visibility: hidden;
-				transition: 0.5s cubic-bezier(0.16, 1, 0.3, 1);
-				cursor: zoom-out;
-			}
-
-			#lightbox.active { opacity: 1; visibility: visible; }
-
-			#lightbox img { 
-				max-width: 90vw; 
-				max-height: 85vh; 
-				object-fit: contain;
-				transform: scale(0.9); 
-				transition: 0.6s cubic-bezier(0.16, 1, 0.3, 1); 
-			}
-
-			#lightbox.active img { transform: scale(1); }
-
-			@media (max-width: 768px) {
-				.photo-card { grid-column: span 12 !important; margin-top: 0 !important; }
-				.gallery-container { gap: 60px; }
-				.photo-meta { opacity: 0.6; transform: none; }
-			}
-		</style>
-	</head>
-	<body>
-		<Header />
-		<main>
-			<div class="gallery-container">
-				{photos.map((photo) => (
-					<div class="photo-card" data-full-src={photo.data.cover}>
-						<div class="image-wrapper">
-							<img src={photo.data.cover} alt={photo.data.title} loading="lazy" />
-						</div>
-						<div class="photo-meta">
-							<h3>{photo.data.title}</h3>
-							{photo.data.description && <p>{photo.data.description}</p>}
-						</div>
-					</div>
-				))}
-			</div>
-		</main>
-
-		<div id="lightbox">
-			<img src="" alt="View" />
-		</div>
-
-		<Footer />
-
-		<script>
-			const lightbox = document.getElementById('lightbox');
-			const lbImg = lightbox?.querySelector('img');
-			
-			document.querySelectorAll('.photo-card').forEach(card => {
-				card.addEventListener('click', () => {
-					const src = card.getAttribute('data-full-src');
-					if (src && lbImg) {
-						lbImg.src = src;
-						lightbox?.classList.add('active');
-						document.body.style.overflow = 'hidden';
-					}
-				});
-			});
-
-			lightbox?.addEventListener('click', () => {
-				lightbox.classList.remove('active');
-				document.body.style.overflow = '';
-				setTimeout(() => { if(lbImg) lbImg.src = ''; }, 500);
-			});
-		</script>
-	</body>
-</html>
+<style>
+  /* 这里保留你之前喜欢的任何 CSS 样式 */
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; padding: 100px 20px; }
+  img { width: 100%; height: auto; display: block; }
+</style>
