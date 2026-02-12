@@ -4,7 +4,7 @@ import BaseHead from '@/components/BaseHead.astro';
 import Header from '@/components/Header.astro';
 import Footer from '@/components/Footer.astro';
 
-// 1. 核心逻辑：定义哪些文件夹的内容可以进入这个房间
+// 1. 核心逻辑：定义内容路由
 export async function getStaticPaths() {
 	const categories = ['essays', 'thinking', 'poems', 'goals'];
 	const allPaths = await Promise.all(
@@ -12,8 +12,8 @@ export async function getStaticPaths() {
 			const posts = await getCollection(cat as any);
 			return posts.map(post => ({
 				params: { 
-					category: cat,    // 对应目录名
-					slug: post.id     // 对应文件名
+					category: cat,
+					slug: post.id
 				},
 				props: { post },
 			}));
@@ -26,7 +26,7 @@ const { post } = Astro.props;
 const { category } = Astro.params;
 const { Content } = await render(post);
 
-// 2. 视觉主题配置：根据分类自动切换点缀色
+// 2. 视觉主题配置
 const themes = {
 	essays: { color: 'var(--ivory)', name: '随笔' },
 	poems: { color: 'var(--silver)', name: '诗歌' },
@@ -40,7 +40,7 @@ const currentTheme = themes[category as keyof typeof themes] || themes.essays;
 	<head>
 		<BaseHead title={post.data.title} description={post.data.description} />
 		<style define:vars={{ themeColor: currentTheme.color }}>
-			/* 顶部进度条：随分类变色 */
+			/* 顶部进度条 */
 			#progress-bar { 
 				position: fixed; top: 0; left: 0; 
 				width: 0%; height: 2px; 
@@ -49,64 +49,131 @@ const currentTheme = themes[category as keyof typeof themes] || themes.essays;
 				transition: width 0.1s ease;
 			}
 
-			main { max-width: 700px; margin: 0 auto; padding: 80px 24px; }
+			main { 
+				max-width: 680px; 
+				margin: 0 auto; 
+				padding: 100px 24px; 
+			}
 
-			.article-header { text-align: center; margin-bottom: 5em; }
+			/* 文章头部设计 */
+			.article-header { 
+				text-align: center; 
+				margin-bottom: 6em; 
+			}
 			.category-tag { 
 				font-family: 'Cinzel', serif; 
-				font-size: 0.7rem; 
-				letter-spacing: 0.4em; 
+				font-size: 0.75rem; 
+				letter-spacing: 0.5em; 
 				color: var(--themeColor); 
-				margin-bottom: 1.5em; 
+				opacity: 0.5;
+				text-transform: uppercase;
 				display: block;
-				opacity: 0.6;
+				margin-bottom: 1.5em;
 			}
 			.article-header h1 { 
 				font-family: 'Cinzel', serif; 
-				font-size: clamp(1.8rem, 5vw, 2.4rem); 
+				font-size: clamp(1.8rem, 5vw, 2.2rem); 
 				color: var(--ivory); 
-				line-height: 1.3;
+				font-weight: 400;
+				line-height: 1.4;
 			}
 
-			/* 正文排版 */
+			/* 正文排版法则 */
 			.prose { 
-				font-family: 'EB Garamond', serif; 
+				font-family: 'EB Garamond', 'Noto Serif SC', serif; 
 				font-size: 1.25rem; 
-				line-height: 1.85; 
-				color: rgba(255, 255, 255, 0.85); 
+				line-height: 1.9; 
+				color: rgba(255, 255, 255, 0.8); 
+				text-align: justify;
+				word-break: break-word;
 			}
 
-			/* --- 智能首字下沉：诗歌分类自动禁用 --- */
+			/* 段落间距 */
+			.prose :global(p) {
+				margin-bottom: 2.2rem;
+			}
+
+			/* 智能首字下沉：仅在非诗歌分类生效 */
 			.prose:not(.is-poems) :global(p:first-of-type::first-letter) {
 				font-family: 'Cinzel', serif;
-				font-size: 1.8rem;
+				font-size: 1.9rem;
 				font-weight: 700;
 				color: var(--themeColor);
-				margin-right: 0.1em;
-				float: none;
+				padding-right: 0.15em;
 				vertical-align: baseline;
 			}
 
-			/* 诗歌模式：居中且更具空气感 */
+			/* 诗歌模式排版 */
 			.is-poems { 
 				text-align: center; 
-				letter-spacing: 0.05em;
+				letter-spacing: 0.08em;
 			}
-			.is-poems :global(p) { margin-bottom: 2em; }
+			.is-poems :global(p) { 
+				margin-bottom: 2.5rem; 
+				text-align: center;
+			}
 
-			/* 素雅引文 */
+			/* 引文排版：极简线条感 */
 			.prose :global(blockquote) {
-				margin: 3em 0;
-				padding: 0.5em 1.5em;
-				border-left: 1px solid var(--themeColor);
-				opacity: 0.8;
+				margin: 4em auto;
+				padding: 1em 0;
+				border-top: 1px solid rgba(255, 255, 255, 0.1);
+				border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+				text-align: center; 
 				font-style: italic;
+				color: var(--themeColor);
+				max-width: 85%;
+				opacity: 0.9;
+			}
+			.prose :global(blockquote p) {
+				margin: 1em 0;
+				font-size: 1.15rem;
+			}
+
+			/* 列表排版（针对 Goals/清单） */
+			.prose :global(ul) {
+				list-style: none;
+				padding: 0;
+				margin: 2em 0;
+			}
+			.prose :global(li) {
+				margin-bottom: 1.2rem;
+				padding-left: 1.5em;
+				position: relative;
+			}
+			.prose :global(li::before) {
+				content: '—';
+				position: absolute;
+				left: 0;
+				opacity: 0.4;
+				color: var(--themeColor);
+			}
+
+			/* 文章底部导航 */
+			.post-footer {
+				margin-top: 8em;
+				padding-top: 2em;
+				border-top: 1px solid rgba(255, 255, 255, 0.05);
+				text-align: center;
+			}
+			.back-link {
+				font-family: 'Cinzel', serif;
+				font-size: 0.8rem;
+				color: var(--ivory);
+				text-decoration: none;
+				letter-spacing: 0.2em;
+				opacity: 0.4;
+				transition: 0.3s;
+			}
+			.back-link:hover {
+				opacity: 1;
 				color: var(--themeColor);
 			}
 
 			@media (max-width: 720px) {
 				main { padding: 60px 20px; }
-				.article-header { margin-bottom: 3em; }
+				.article-header { margin-bottom: 4em; }
+				.prose { font-size: 1.15rem; text-align: left; } /* 移动端取消两端对齐避免间隙过大 */
 			}
 		</style>
 	</head>
@@ -123,6 +190,12 @@ const currentTheme = themes[category as keyof typeof themes] || themes.essays;
 					<Content />
 				</div>
 			</article>
+
+			<footer class="post-footer">
+				<a href={`/writing/${category}`} class="back-link">
+					BACK TO {currentTheme.name}
+				</a>
+			</footer>
 		</main>
 		<script>
 			const updateProgress = () => {
