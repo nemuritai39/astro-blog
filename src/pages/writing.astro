@@ -1,49 +1,37 @@
 ---
+import { getCollection } from 'astro:content';
 import BaseHead from '../components/BaseHead.astro';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 import { SITE_TITLE, SITE_DESCRIPTION } from '../consts';
 
+// 定义分类元数据
 const categories = [
-	{ 
-		id: 'essays', 
-		title: '随笔', 
-		latin: 'ESSAYS', 
-		desc: '在墨痕的间隙，捕捉灵魂碎裂的低语。', 
-		color: 'var(--ivory)',
-		quote: '“文字是思绪在雪堆压出的痕迹。”'
-	},
-	{ 
-		id: 'poems', 
-		title: '诗歌', 
-		latin: 'POEMS', 
-		desc: '捕捉碎裂的韵律，在短句的尽头等待回声。', 
-		color: 'var(--silver)',
-		quote: '“韵律是跳动的脉搏。”'
-	},
-	{ 
-		id: 'thinking', 
-		title: '思考', 
-		latin: 'THINKING', 
-		desc: '于无声处听惊雷，在自省中重构世界。', 
-		color: 'var(--accent-gold)',
-		quote: '“自省是通往真实的唯一路径。”'
-	},
-	{ 
-		id: 'goals', 
-		title: '目标', 
-		latin: 'GOALS', 
-		desc: '尚未达成的契约，终将成为现实的刻度。', 
-		color: '#b39ddb',
-		quote: '“与未来的自己立下字据。”'
-	},
+	{ id: 'essays', title: '随笔', latin: 'ESSAYS', desc: '在墨痕的间隙，捕捉灵魂碎裂的低语。', color: 'var(--ivory)' },
+	{ id: 'poems', title: '诗歌', latin: 'POEMS', desc: '捕捉碎裂的韵律，在短句的尽头等待回声。', color: 'var(--silver)' },
+	{ id: 'thinking', title: '思考', latin: 'THINKING', desc: '于无声处听惊雷，在自省中重构世界。', color: 'var(--accent-gold)' },
+	{ id: 'goals', title: '目标', latin: 'GOALS', desc: '尚未达成的契约，终将成为现实的刻度。', color: '#b39ddb' },
 ];
+
+// 抓取每个分类下最新的一篇文章
+const getLatestPost = async (collectionName) => {
+	const posts = await getCollection(collectionName);
+	return posts.sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf())[0];
+};
+
+// 预处理所有分类的最新文章
+const categoriesWithLatest = await Promise.all(
+	categories.map(async (cat) => {
+		const latestPost = await getLatestPost(cat.id);
+		return { ...cat, latestPost };
+	})
+);
 ---
 
 <!doctype html>
 <html lang="en">
 	<head>
-		<BaseHead title={`Archives - ${SITE_TITLE}`} description={SITE_DESCRIPTION} />
+		<BaseHead title={`Writing - ${SITE_TITLE}`} description={SITE_DESCRIPTION} />
 		<style>
 			main { max-width: 1000px; margin: 0 auto; padding: 100px 20px; }
 			.page-header { text-align: center; margin-bottom: 100px; }
@@ -64,28 +52,37 @@ const categories = [
 
 			.cat-id {
 				font-family: 'Cinzel', serif;
-				font-size: 0.9rem;
+				font-size: 0.8rem;
 				color: var(--accent-gold);
 				width: 120px;
 				flex-shrink: 0;
-				padding-top: 10px;
+				padding-top: 12px;
+				opacity: 0.6;
 			}
 
 			.cat-content { flex-grow: 1; }
-			.cat-content h2 { font-family: 'Cinzel', serif; font-size: 2rem; margin: 0 0 10px 0; color: #fff; transition: 0.4s; }
-			.cat-content p { font-family: 'Cormorant Garamond', serif; font-style: italic; color: rgba(255, 255, 255, 0.4); font-size: 1.2rem; margin: 0; }
+			.cat-content h2 { font-family: 'Cinzel', serif; font-size: 2rem; margin: 0 0 10px 0; transition: 0.4s; }
+			.cat-content p { font-family: 'Cormorant Garamond', serif; font-style: italic; color: rgba(255, 255, 255, 0.3); font-size: 1.1rem; margin: 0; }
 			
-			.cat-quote {
-				font-size: 0.85rem;
-				color: var(--accent-gold);
-				opacity: 0;
-				transition: 0.6s;
+			/* 最新文章展示区 */
+			.latest-post {
 				margin-top: 15px;
 				font-family: 'EB Garamond', serif;
+				font-size: 0.9rem;
+				color: var(--accent-gold);
+				opacity: 0.5;
+				display: flex;
+				align-items: center;
+				transition: 0.4s;
+			}
+			.latest-post::before {
+				content: 'RECENT —';
+				margin-right: 10px;
+				font-size: 0.7rem;
+				letter-spacing: 0.1em;
 			}
 
-			.category-row:hover .cat-quote { opacity: 0.5; }
-			.category-row:hover h2 { letter-spacing: 0.1em; }
+			.category-row:hover .latest-post { opacity: 0.9; transform: translateX(5px); }
 
 			@media (max-width: 768px) {
 				.category-row { flex-direction: column; }
@@ -101,13 +98,18 @@ const categories = [
 			</section>
 
 			<div class="archive-grid">
-				{categories.map((cat) => (
+				{categoriesWithLatest.map((cat) => (
 					<a href={`/writing/${cat.id}`} class="category-row">
 						<span class="cat-id">{cat.latin}</span>
 						<div class="cat-content">
 							<h2 style={`color: ${cat.color}`}>{cat.title}</h2>
 							<p>{cat.desc}</p>
-							<div class="cat-quote">{cat.quote}</div>
+							
+							{cat.latestPost && (
+								<div class="latest-post">
+									{cat.latestPost.data.title}
+								</div>
+							)}
 						</div>
 					</a>
 				))}
