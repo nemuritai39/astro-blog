@@ -1,0 +1,138 @@
+---
+import BaseHead from "../components/BaseHead.astro";
+import Header from "../components/Header.astro";
+import Footer from "../components/Footer.astro";
+import { SITE_TITLE } from "../consts";
+
+const pageTitle = `Writing · ${SITE_TITLE}`;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <BaseHead title={pageTitle} description="文字模块：随笔、诗歌、思考、目标。" />
+  </head>
+
+  <body>
+    <Header />
+
+    <main class="wrap">
+      <header class="top">
+        <h1>Writing</h1>
+        <p class="sub">随笔、诗歌、思考、目标。</p>
+      </header>
+
+      <section class="grid">
+        <a class="card" href="/writing/essays">
+          <div class="kicker">Essays</div>
+          <div class="title">随笔</div>
+          <div class="desc">记录日常、片段与叙述。</div>
+        </a>
+
+        <a class="card" href="/writing/poems">
+          <div class="kicker">Poems</div>
+          <div class="title">诗歌</div>
+          <div class="desc">短句、节奏与情绪。</div>
+        </a>
+
+        <a class="card" href="/writing/thinking">
+          <div class="kicker">Thinking</div>
+          <div class="title">思考</div>
+          <div class="desc">观念、推演与自问自答。</div>
+        </a>
+
+        <a class="card" href="/writing/goals">
+          <div class="kicker">Goals</div>
+          <div class="title">目标</div>
+          <div class="desc">长期/短期，拆解与回顾。</div>
+        </a>
+      </section>
+
+      <section class="note">
+        <h2>How it works</h2>
+        <p>下一步我们会把这四个模块做成“往文件夹丢一篇 Markdown 就自动生成目录与详情页”的内容系统。</p>
+      </section>
+    </main>
+
+    <Footer />
+  </body>
+</html>
+
+<style>
+  .wrap{max-width:1100px;margin:0 auto;padding:56px 20px;}
+  .top h1{margin:0}
+  .sub{opacity:.82;margin-top:10px}
+
+  .grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(240px,1fr));
+    gap:16px;
+    margin-top:26px
+  }
+
+  .card{
+    display:block;
+    padding:18px 18px 16px;
+    border:1px solid rgba(255,255,255,.14);
+    border-radius:18px;
+    text-decoration:none;
+    color:inherit;
+    background: rgba(255,255,255,.03);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .card::before{
+    content:"";
+    position:absolute;
+    inset:-1px;
+    background: radial-gradient(600px 180px at 10% 0%, rgba(214,178,94,.14), transparent 55%),
+                radial-gradient(500px 180px at 90% 20%, rgba(212,60,60,.10), transparent 55%);
+    opacity: .75;
+    pointer-events:none;
+  }
+
+  .card:hover{border-color:rgba(214,178,94,.75)}
+  .card:hover .kicker{color:rgba(214,178,94,.95)}
+  .card:hover .title{color:rgba(245,247,250,.98)}
+
+  .kicker{
+    position:relative;
+    display:inline-block;
+    font-size:.82rem;
+    letter-spacing:.18em;
+    text-transform:uppercase;
+    color: rgba(245,247,250,.72);
+  }
+
+  .title{
+    position:relative;
+    margin-top:8px;
+    font-size:1.35rem;
+    font-weight:700;
+    color: rgba(245,247,250,.92);
+  }
+
+  .desc{
+    position:relative;
+    margin-top:8px;
+    opacity:.78;
+    line-height:1.6;
+  }
+
+  .note{
+    margin-top:34px;
+    padding:18px;
+    border:1px solid rgba(255,255,255,.10);
+    border-radius:18px;
+    background: rgba(255,255,255,.02);
+  }
+
+  .note h2{
+    margin:0 0 10px 0;
+    font-size:1.05rem;
+    letter-spacing:.08em;
+    text-transform:uppercase;
+    opacity:.92;
+  }
+</style>
