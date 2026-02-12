@@ -1,12 +1,11 @@
 ---
 import { getCollection, render } from 'astro:content';
-// 这里是终极关键！详情页更深，必须退回三层
-import BaseHead from "../../../components/BaseHead.astro";
-import Header from "../../../components/Header.astro";
-import Footer from "../../../components/Footer.astro";
+import BaseHead from '@/components/BaseHead.astro';
+import Header from '@/components/Header.astro';
+import Footer from '@/components/Footer.astro';
 
 export async function getStaticPaths() {
-  const entries = await getCollection('essays');
+  const entries = await getCollection('essays'); // 对应修改这里
   return entries.map(entry => ({
     params: { slug: entry.id },
     props: { entry },
@@ -23,10 +22,10 @@ const { Content } = await render(entry);
   </head>
   <body>
     <Header />
-    <main style="max-width: 800px; margin: 80px auto; padding: 20px;">
+    <main style="max-width: 800px; margin: 100px auto; padding: 0 20px;">
       <article>
         <h1 style="font-family: var(--font-display); color: #d6b25e; font-size: 3rem;">{entry.data.title}</h1>
-        <div class="prose" style="line-height: 1.8; margin-top: 30px;">
+        <div class="prose" style="line-height: 1.8; margin-top: 40px;">
           <Content />
         </div>
       </article>
