@@ -1,11 +1,12 @@
 ---
-import BaseHead from '../../components/BaseHead.astro';
-import Header from '../../components/Header.astro';
-import Footer from '../../components/Footer.astro';
-import { SITE_TITLE, SITE_DESCRIPTION } from '../../consts';
+import BaseHead from '../components/BaseHead.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import { SITE_TITLE, SITE_DESCRIPTION } from '../consts';
 
+// 这里定义你的分类，直接在这里改文字即可
 const categories = [
-	{ id: 'essays', title: '随笔', latin: 'ESSAYS', desc: '记录日常、片段与叙述。', color: 'var(--ivory)' },
+	{ id: 'essays', title: '随笔', latin: 'ESSAYS', desc: '下雪了，白色的雪。记录日常、片段与叙述。', color: 'var(--ivory)' },
 	{ id: 'poems', title: '诗歌', latin: 'POEMS', desc: '短句、节奏与情绪。', color: 'var(--silver)' },
 	{ id: 'thinking', title: '思考', latin: 'THINKING', desc: '观念、推演与自问自答。', color: 'var(--accent-gold)' },
 	{ id: 'goals', title: '目标', latin: 'GOALS', desc: '长期/短期，拆解与回顾。', color: '#b39ddb' },
@@ -20,7 +21,7 @@ const categories = [
 			main {
 				max-width: 1000px;
 				margin: 0 auto;
-				padding: 100px 20px;
+				padding: 80px 20px;
 				min-height: 80vh;
 			}
 
@@ -53,7 +54,8 @@ const categories = [
 
 			@media (max-width: 768px) {
 				.archive-container { grid-template-columns: 1fr; }
-				main { padding: 60px 20px; }
+				main { padding: 40px 20px; }
+				.page-header h1 { font-size: 2rem; }
 			}
 
 			.archive-item {
@@ -66,6 +68,7 @@ const categories = [
 				overflow: hidden;
 			}
 
+			/* 底部光痕 */
 			.archive-item::before {
 				content: '';
 				position: absolute;
@@ -111,11 +114,11 @@ const categories = [
 				max-width: 280px;
 			}
 
-			/* 每个分类悬停时的色彩光晕 */
-			.item-essays:hover h2 { color: var(--ivory); text-shadow: 0 0 15px rgba(240,235,220,0.3); }
-			.item-poems:hover h2 { color: var(--silver); text-shadow: 0 0 15px rgba(225,229,233,0.3); }
-			.item-thinking:hover h2 { color: var(--accent-gold); text-shadow: 0 0 15px rgba(210,195,160,0.3); }
-			.item-goals:hover h2 { color: #b39ddb; text-shadow: 0 0 15px rgba(179,157,219,0.3); }
+			/* 悬停色彩反馈 */
+			.item-essays:hover h2 { color: var(--ivory); }
+			.item-poems:hover h2 { color: var(--silver); }
+			.item-thinking:hover h2 { color: var(--accent-gold); }
+			.item-goals:hover h2 { color: #b39ddb; }
 
 		</style>
 	</head>
@@ -129,7 +132,7 @@ const categories = [
 
 			<div class="archive-container">
 				{categories.map((cat) => (
-					<a href={`/writing/${cat.id}`} class={`archive-item item-${cat.id}`}>
+					<a href={`/blog`} class={`archive-item item-${cat.id}`}>
 						<span class="latin-tag">{cat.latin}</span>
 						<h2>{cat.title}</h2>
 						<p>{cat.desc}</p>
