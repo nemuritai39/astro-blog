@@ -5,14 +5,11 @@ import Header from '../../components/Header.astro';
 import Footer from '../../components/Footer.astro';
 import { SITE_TITLE } from '../../consts';
 
-// 1. 强力抓取
-let moments = [];
-try {
-    const raw = await getCollection('with-you');
-    moments = raw.sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
-} catch (e) {
-    console.error("抓取失败:", e);
-}
+// 1. 获取并排序（日期从新到旧）
+const posts = await getCollection('with-you');
+const sortedPosts = posts.sort(
+	(a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf()
+);
 
 const PASSWORD = "0309"; 
 ---
@@ -23,45 +20,84 @@ const PASSWORD = "0309";
 		<BaseHead title={`With You - ${SITE_TITLE}`} />
 		<style>
 			:root { --gold: #d6b25e; --bg: #050505; }
-			body { background: var(--bg); color: #fff; margin: 0; }
-			#gate { position: fixed; inset: 0; background: var(--bg); z-index: 10001; display: flex; flex-direction: column; align-items: center; justify-content: center; }
-			#gate.hidden { display: none; }
-			#pw-box { background: transparent; border: none; border-bottom: 1px solid var(--gold); color: #fff; text-align: center; font-size: 1.8rem; width: 260px; outline: none; }
-			main { max-width: 800px; margin: 0 auto; padding: 150px 20px; }
-			.card { margin-bottom: 100px; text-align: center; }
-			/* 修复裂图的关键：确保图片不溢出且路径正确 */
-			.card img { width: 100%; height: auto; max-height: 70vh; object-fit: contain; margin: 2rem 0; border: 1px solid rgba(214,178,94,0.2); }
+			html, body { background: var(--bg) !important; color: #fff; margin: 0; }
+			
+			/* 密码锁屏 */
+			#gate { 
+				position: fixed; inset: 0; background: var(--bg); z-index: 10001; 
+				display: flex; flex-direction: column; align-items: center; justify-content: center; 
+				transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+			}
+			#gate.hidden { opacity: 0; visibility: hidden; pointer-events: none; transform: translateY(-20px); }
+			#pw-box { 
+				background: transparent; border: none; border-bottom: 1px solid var(--gold); 
+				color: #fff; text-align: center; font-size: 2rem; width: 200px; outline: none; 
+				font-family: 'Cinzel', serif; letter-spacing: 0.2em;
+			}
+
+			/* 响应式布局 */
+			main { max-width: 900px; margin: 0 auto; padding: 160px 24px; }
+			.memory-card { margin-bottom: 150px; text-align: center; opacity: 0; transform: translateY(30px); transition: all 1s ease; }
+			.memory-card.visible { opacity: 1; transform: translateY(0); }
+			
+			.date { font-family: 'Cinzel', serif; color: var(--gold); letter-spacing: 0.3em; font-size: 0.9rem; }
+			
+			.img-container { position: relative; margin: 2.5rem 0; overflow: hidden; border-radius: 4px; }
+			.memory-card img { 
+				width: 100%; height: auto; max-height: 80vh; object-fit: contain;
+				box-shadow: 0 40px 100px rgba(0,0,0,0.7);
+			}
+			
+			h2 { font-family: 'Cinzel', serif; font-size: 1.8rem; font-weight: 400; margin: 1.5rem 0 0.5rem; }
+			.desc { color: rgba(255,255,255,0.4); font-style: italic; font-size: 1.1rem; }
 		</style>
 	</head>
 	<body>
 		<div id="gate">
-			<input type="password" id="pw-box" autofocus placeholder="PASSCODE" />
+			<p style="color: var(--gold); letter-spacing: 0.5em; font-family: 'Cinzel'; margin-bottom: 2rem; font-size: 0.7rem;">PRIVATE ARCHIVE</p>
+			<input type="password" id="pw-box" autofocus placeholder="••••" />
 		</div>
 
 		<Header />
-		<main>
-			{moments.length > 0 ? (
-				moments.map((m) => (
-					<div class="card">
-						<div style="color:var(--gold); font-family:Cinzel;">{m.data.pubDate.toDateString()}</div>
-						<img src={m.data.cover.startsWith('/') ? m.data.cover : `/${m.data.cover}`} alt={m.data.title} />
-						<h2 style="font-family:Cinzel;">{m.data.title}</h2>
-						<p style="opacity:0.5; font-style:italic;">{m.data.description}</p>
+		
+		<main id="main-content">
+			{sortedPosts.map((post) => (
+				<section class="memory-card">
+					<div class="date">{post.data.pubDate.toDateString()}</div>
+					<div class="img-container">
+						<img src={post.data.cover} alt={post.data.title} loading="lazy" />
 					</div>
-				))
-			) : (
-				<div style="text-align:center; padding:100px; opacity:0.5;">
-					<p>FOUND: {moments.length}</p>
-					<p>请检查: src/content/with-you/ 是否有 .md</p>
-				</div>
-			)}
+					<h2>{post.data.title}</h2>
+					{post.data.description && <p class="desc">{post.data.description}</p>}
+				</section>
+			))}
 		</main>
+
 		<Footer />
 
 		<script define:vars={{ PASSWORD }}>
-			document.getElementById('pw-box').addEventListener('input', (e) => {
-				if (e.target.value === PASSWORD) document.getElementById('gate').classList.add('hidden');
+			// 密码逻辑
+			const gate = document.getElementById('gate');
+			const input = document.getElementById('pw-box');
+			
+			input.addEventListener('input', (e) => {
+				if (e.target.value === PASSWORD) {
+					gate.classList.add('hidden');
+					// 解锁后触发滚动动画
+					reveal();
+				}
 			});
+
+			// 简单的入场动画
+			function reveal() {
+				const cards = document.querySelectorAll('.memory-card');
+				cards.forEach((card, i) => {
+					setTimeout(() => card.classList.add('visible'), i * 200);
+				});
+			}
+			
+			// 如果已经解锁（刷新页面），自动运行
+			if (gate.classList.contains('hidden')) reveal();
 		</script>
 	</body>
 </html>
