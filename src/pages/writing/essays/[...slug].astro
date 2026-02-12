@@ -4,32 +4,118 @@ import BaseHead from '@/components/BaseHead.astro';
 import Header from '@/components/Header.astro';
 import Footer from '@/components/Footer.astro';
 
+// 1. 生成所有文章的路径
 export async function getStaticPaths() {
-  const entries = await getCollection('essays'); // 对应修改这里
-  return entries.map(entry => ({
-    params: { slug: entry.id },
-    props: { entry },
-  }));
+	const posts = await getCollection('essays');
+	return posts.map((post) => ({
+		params: { slug: post.id },
+		props: post,
+	}));
 }
 
-const { entry } = Astro.props;
-const { Content } = await render(entry);
+// 2. 获取文章内容
+const post = Astro.props;
+const { Content } = await render(post);
 ---
 
 <html lang="en">
-  <head>
-    <BaseHead title={entry.data.title} description={entry.data.description} />
-  </head>
-  <body>
-    <Header />
-    <main style="max-width: 800px; margin: 100px auto; padding: 0 20px;">
-      <article>
-        <h1 style="font-family: var(--font-display); color: #d6b25e; font-size: 3rem;">{entry.data.title}</h1>
-        <div class="prose" style="line-height: 1.8; margin-top: 40px;">
-          <Content />
-        </div>
-      </article>
-    </main>
-    <Footer />
-  </body>
+	<head>
+		<BaseHead title={post.data.title} description={post.data.description} />
+		<style>
+			main {
+				width: calc(100% - 2em);
+				max-width: 800px;
+				margin: 0 auto;
+				padding: 3em 1em;
+			}
+			.prose {
+				font-family: 'EB Garamond', serif;
+				line-height: 1.8;
+				font-size: 1.25rem;
+				color: rgba(255, 255, 255, 0.85);
+			}
+
+			/* 文章头部信息 */
+			.title {
+				margin-bottom: 2em;
+				padding: 1em 0;
+				text-align: center;
+				border-bottom: 1px solid rgba(214, 178, 94, 0.2);
+			}
+			.title h1 {
+				font-family: 'Cinzel', serif;
+				margin: 0 0 0.5em 0;
+				color: #f0ebdc;
+				font-size: 2.5rem;
+			}
+			.date {
+				font-family: 'Cormorant Garamond', serif;
+				font-style: italic;
+				color: #d6b25e;
+				opacity: 0.7;
+			}
+
+			/* 重点：首字下沉 (Drop Cap) */
+			.prose :global(p:first-of-type::first-letter) {
+				float: left;
+				font-family: 'Cinzel', serif;
+				font-size: 4rem;
+				line-height: 1;
+				margin: 0.1em 0.15em 0 0;
+				color: #d6b25e;
+				text-shadow: 2px 2px 0 rgba(0, 0, 0, 0.5);
+			}
+
+			/* 正文内的标题美化 */
+			.prose :global(h2), .prose :global(h3) {
+				font-family: 'Cinzel', serif;
+				color: #d6b25e;
+				margin-top: 1.5em;
+				letter-spacing: 0.1em;
+			}
+
+			/* 图片与引用块 */
+			.prose :global(img) {
+				border-radius: 4px;
+				box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+				margin: 2em 0;
+			}
+			.prose :global(blockquote) {
+				margin: 2em 0;
+				padding-left: 1.5em;
+				border-left: 2px solid #d6b25e;
+				font-style: italic;
+				color: rgba(214, 178, 94, 0.8);
+			}
+
+			/* 手机端适配 */
+			@media (max-width: 720px) {
+				main { padding: 1em; }
+				.title h1 { font-size: 1.8rem; }
+				.prose { font-size: 1.15rem; }
+			}
+		</style>
+	</head>
+
+	<body>
+		<Header />
+		<main>
+			<article>
+				<div class="title">
+					<div class="date">
+						{post.data.pubDate.toLocaleDateString('en-us', {
+							year: 'numeric',
+							month: 'short',
+							day: 'numeric',
+						})}
+					</div>
+					<h1>{post.data.title}</h1>
+				</div>
+				<div class="prose">
+					<Content />
+				</div>
+			</article>
+		</main>
+		<Footer />
+	</body>
 </html>
