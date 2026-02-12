@@ -1,13 +1,25 @@
 ---
-import { getCollection } from 'astro:content';
 import BaseHead from '../../components/BaseHead.astro';
 import Header from '../../components/Header.astro';
 import Footer from '../../components/Footer.astro';
 import { SITE_TITLE } from '../../consts';
 
-// 1. 获取数据，加一个空数组兜底
-const posts = (await getCollection('with-you')) || [];
-const sortedPosts = posts.sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
+// --- 手动定义数据，绕过 getCollection 的坑 ---
+const memories = [
+  {
+    title: "waimai",
+    date: "2026-02-12",
+    cover: "/with-you/chiwaimai.png",
+    description: "food"
+  },
+  {
+    title: "zaoxing",
+    date: "2026-02-10",
+    cover: "/with-you/zaoxing.png",
+    description: "night view"
+  }
+  // 如果还有别的，按这个格式手动加在这里
+];
 
 const PASSWORD = "0309"; 
 ---
@@ -38,20 +50,14 @@ const PASSWORD = "0309";
 
 		<Header />
 		<main>
-			{sortedPosts.length > 0 ? (
-				sortedPosts.map((post) => (
-					<div class="memory-item">
-						<div class="date">{post.data.pubDate.toDateString()}</div>
-						<img src={post.data.cover} alt={post.data.title} />
-						<h2>{post.data.title}</h2>
-						{post.data.description && <p class="desc">{post.data.description}</p>}
-					</div>
-				))
-			) : (
-				<div style="text-align:center; padding: 100px; opacity:0.5;">
-					No memories found. Total: {sortedPosts.length}
+			{memories.map((post) => (
+				<div class="memory-item">
+					<div class="date">{post.date}</div>
+					<img src={post.cover} alt={post.title} />
+					<h2>{post.title}</h2>
+					<p class="desc">{post.description}</p>
 				</div>
-			)}
+			))}
 		</main>
 		<Footer />
 
