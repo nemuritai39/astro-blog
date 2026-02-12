@@ -1,9 +1,0 @@
----
-// Header 里使用的链接组件：只负责 active class，不在这里写样式
-const { href, text } = Astro.props;
-const isActive = Astro.url.pathname === href;
----
-
-<a href={href} class:list={[isActive && 'active']} aria-current={isActive ? 'page' : undefined}>
-  {text}
-</a>
