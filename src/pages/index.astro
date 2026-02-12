@@ -1,182 +1,149 @@
 ---
 import BaseHead from '../components/BaseHead.astro';
-import Footer from '../components/Footer.astro';
 import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
 import { SITE_TITLE, SITE_DESCRIPTION } from '../consts';
-import '../styles/global.css';
-
-const pageTitle = SITE_TITLE;
 ---
 
 <!doctype html>
 <html lang="en">
 	<head>
-		<BaseHead title={pageTitle} description={SITE_DESCRIPTION} />
+		<BaseHead title={SITE_TITLE} description={SITE_DESCRIPTION} />
+		<style>
+			main {
+				width: 100%;
+				max-width: 1200px;
+				margin: 0 auto;
+				padding: 60px 20px;
+			}
+
+			/* 标题区域：祭坛顶部 */
+			.hero-section {
+				text-align: center;
+				margin-bottom: 80px;
+			}
+			.hero-section h1 {
+				font-family: 'Cinzel', serif;
+				font-size: clamp(3rem, 8vw, 5rem);
+				letter-spacing: 0.2em;
+				background: linear-gradient(to bottom, #fff, #d6b25e);
+				-webkit-background-clip: text;
+				-webkit-text-fill-color: transparent;
+				margin-bottom: 20px;
+			}
+			.hero-section .mark {
+				color: #d6b25e;
+				font-size: 1.5rem;
+				margin-bottom: 20px;
+				display: block;
+			}
+
+			/* 祭坛卡片网格：解决排版不均 */
+			.altar-grid {
+				display: grid;
+				grid-template-columns: repeat(3, 1fr);
+				gap: 30px;
+			}
+
+			@media (max-width: 900px) {
+				.altar-grid {
+					grid-template-columns: 1fr;
+				}
+			}
+
+			/* 祭坛卡片基础样式 */
+			.temple-card {
+				position: relative;
+				background: linear-gradient(145deg, rgba(30,30,35,0.8), rgba(15,15,18,0.95));
+				border: 1px solid rgba(214, 178, 94, 0.15);
+				border-radius: 4px; /* 稍微方正一点更有碑林感 */
+				padding: 50px 30px;
+				text-align: center;
+				text-decoration: none;
+				transition: all 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+				overflow: hidden;
+				display: flex;
+				flex-direction: column;
+				align-items: center;
+				justify-content: center;
+			}
+
+			/* 悬停效果：神圣光晕 */
+			.temple-card:hover {
+				border-color: rgba(214, 178, 94, 0.5);
+				transform: translateY(-10px);
+				box-shadow: 0 15px 40px rgba(0, 0, 0, 0.8), 0 0 20px rgba(214, 178, 94, 0.1);
+			}
+
+			.temple-card::before {
+				content: '';
+				position: absolute;
+				top: 0; left: 0; width: 100%; height: 100%;
+				background: radial-gradient(circle at center, rgba(214, 178, 94, 0.05) 0%, transparent 70%);
+				opacity: 0;
+				transition: opacity 0.5s;
+			}
+			.temple-card:hover::before {
+				opacity: 1;
+			}
+
+			.temple-card h2 {
+				font-family: 'Cinzel', serif;
+				color: #d6b25e;
+				font-size: 1.8rem;
+				letter-spacing: 0.15em;
+				margin: 20px 0;
+				z-index: 1;
+			}
+
+			.temple-card p {
+				font-family: 'Cormorant Garamond', serif;
+				font-style: italic;
+				color: rgba(255, 255, 255, 0.45);
+				font-size: 1.1rem;
+				line-height: 1.6;
+				z-index: 1;
+				max-width: 240px;
+			}
+
+			/* 装饰性的小十字星 */
+			.stud {
+				width: 8px; height: 8px;
+				background: #d6b25e;
+				transform: rotate(45deg);
+				margin-bottom: 10px;
+				opacity: 0.6;
+			}
+		</style>
 	</head>
 	<body>
 		<Header />
-		<main class="wrap">
-			<header class="hero">
-				<h1>nemu · archive</h1>
-				<p class="tagline">{SITE_DESCRIPTION}</p>
-				<div class="divider" aria-hidden="true">
-					<div class="line" />
-					<div class="gem" />
-					<div class="line" />
-				</div>
-			</header>
-
-			<section class="links">
-				<a class="card" href="/writing">
-					<div class="icon" aria-hidden="true">✍</div>
-					<div class="label">Writing</div>
-					<div class="desc">随笔 · 诗歌 · 思考 · 目标</div>
-				</a>
-
-				<a class="card" href="/gallery">
-					<div class="icon" aria-hidden="true">◆</div>
-					<div class="label">Gallery</div>
-					<div class="desc">照片与视频的归档</div>
-				</a>
-
-				<a class="card" href="/with-you">
-					<div class="icon" aria-hidden="true">⚷</div>
-					<div class="label">With You</div>
-					<div class="desc">私密空间</div>
-				</a>
+		<main>
+			<section class="hero-section">
+				<span class="mark">✠</span>
+				<h1>NEMU · ARCHIVE</h1>
 			</section>
+
+			<div class="altar-grid">
+				<a href="/writing" class="temple-card">
+					<div class="stud"></div>
+					<h2>WRITING</h2>
+					<p>“ 在墨痕的间隙，捕捉灵魂碎裂的低语。”</p>
+				</a>
+
+				<a href="/gallery" class="temple-card">
+					<div class="stud"></div>
+					<h2>GALLERY</h2>
+					<p>“ 光影的残像，是时间在这个世界留下的唯一证词。”</p>
+				</a>
+
+				<a href="/with-you" class="temple-card">
+					<div class="stud"></div>
+					<h2>WITH YOU</h2>
+					<p>“ 跨越禁忌的边界，于虚无中与你同频。”</p>
+				</a>
+			</div>
 		</main>
 		<Footer />
 	</body>
 </html>
-
-<style>
-	.wrap {
-		max-width: 920px;
-		margin: 0 auto;
-		padding: 80px 20px;
-	}
-
-	.hero {
-		text-align: center;
-		margin-bottom: 60px;
-		padding: 40px 0;
-	}
-
-	.hero h1 {
-		margin: 0;
-		font-family: var(--font-display);
-		font-size: clamp(2.5rem, 6vw, 4rem);
-		letter-spacing: .06em;
-		background: linear-gradient(135deg, 
-			rgba(214,178,94,.95), 
-			rgba(245,247,250,.92), 
-			rgba(190,46,58,.85)
-		);
-		-webkit-background-clip: text;
-		-webkit-text-fill-color: transparent;
-		background-clip: text;
-	}
-
-	.tagline {
-		margin-top: 20px;
-		font-size: 1.2rem;
-		opacity: 0.85;
-		letter-spacing: .04em;
-	}
-
-	.divider {
-		margin-top: 30px;
-		display: grid;
-		grid-template-columns: 1fr auto 1fr;
-		align-items: center;
-		gap: 14px;
-		opacity: .9;
-	}
-
-	.divider .line {
-		height: 1px;
-		background: linear-gradient(90deg, transparent, rgba(255,255,255,.18), transparent);
-	}
-
-	.divider .gem {
-		width: 10px;
-		height: 10px;
-		transform: rotate(45deg);
-		background: radial-gradient(circle at 30% 30%, 
-			rgba(255,255,255,.85), 
-			rgba(214,178,94,.58) 45%, 
-			rgba(120,18,30,.55) 80%
-		);
-		border: 1px solid rgba(214,178,94,.55);
-		box-shadow: 0 0 0 6px rgba(120,18,30,.10), 0 12px 26px rgba(0,0,0,.55);
-		border-radius: 2px;
-	}
-
-	.links {
-		display: grid;
-		grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-		gap: 24px;
-		margin-top: 40px;
-	}
-
-	.card {
-		display: block;
-		padding: 32px 28px;
-		border: 1px solid rgba(255,255,255,.14);
-		border-radius: 22px;
-		text-decoration: none;
-		color: inherit;
-		background: linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.02));
-		position: relative;
-		overflow: hidden;
-		transition: transform .18s ease, border-color .18s ease;
-		text-align: center;
-	}
-
-	.card::before {
-		content: "";
-		position: absolute;
-		inset: -1px;
-		background: 
-			radial-gradient(500px 200px at 50% 0%, rgba(214,178,94,.10), transparent 60%),
-			radial-gradient(400px 180px at 50% 100%, rgba(190,46,58,.08), transparent 60%);
-		opacity: .75;
-		pointer-events: none;
-	}
-
-	.card:hover {
-		transform: translateY(-4px);
-		border-color: rgba(214,178,94,.55);
-	}
-
-	.icon {
-		position: relative;
-		font-size: 2.5rem;
-		margin-bottom: 16px;
-		color: rgba(214,178,94,.85);
-		filter: drop-shadow(0 0 14px rgba(214,178,94,.25));
-	}
-
-	.label {
-		position: relative;
-		font-family: var(--font-display);
-		font-size: 1.5rem;
-		font-weight: 600;
-		letter-spacing: .06em;
-		margin-bottom: 8px;
-	}
-
-	.desc {
-		position: relative;
-		opacity: 0.78;
-		line-height: 1.6;
-		font-size: 0.95rem;
-	}
-
-	@media (max-width: 768px) {
-		.links {
-			grid-template-columns: 1fr;
-		}
-	}
-</style>
