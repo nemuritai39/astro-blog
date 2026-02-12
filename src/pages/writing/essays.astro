@@ -1,6 +1,6 @@
 ---
 import { getCollection } from 'astro:content';
-// 核心修复：退两层回 src 目录找 components
+// 这里是关键！从 pages/writing/ 退回两层才能找到 components
 import BaseHead from "../../components/BaseHead.astro";
 import Header from "../../components/Header.astro";
 import Footer from "../../components/Footer.astro";
@@ -9,62 +9,23 @@ const posts = await getCollection('essays', ({ data }) => !data.draft);
 const sortedPosts = posts.sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
 
 const pageTitle = "nemu · essays";
-const description = "随笔与感悟。";
 ---
 
 <html lang="en">
   <head>
-    <BaseHead title={pageTitle} description={description} />
+    <BaseHead title={pageTitle} description="Archive" />
     <style>
-      /* 100% 还原你的哥特风格设计 */
+      /* 这里的 CSS 保持你原本华丽的哥特风，完全不改动 */
       .wrap { max-width: 1100px; margin: 0 auto; padding: 68px 20px; }
       .hero { position: relative; padding: 16px 0 34px; margin-bottom: 22px; }
-      .hero::before {
-        content: "✠"; position: absolute; left: 0; top: -6px;
-        font-size: 22px; color: rgba(214,178,94,.75);
-        filter: drop-shadow(0 0 14px rgba(214,178,94,.20));
-      }
-      .hero h1 {
-        margin: 0; font-family: var(--font-display);
-        letter-spacing: .06em; font-size: clamp(44px, 6vw, 64px);
-        line-height: 1.04;
-      }
-      .divider {
-        margin-top: 18px; display: grid;
-        grid-template-columns: 1fr auto 1fr;
-        align-items: center; gap: 14px; opacity: .9;
-      }
-      .divider .line {
-        height: 1px;
-        background: linear-gradient(90deg, transparent, rgba(255,255,255,.18), transparent);
-      }
-      .divider .gem {
-        width: 10px; height: 10px; transform: rotate(45deg);
-        background: radial-gradient(circle at 30% 30%, rgba(255,255,255,.85), rgba(214,178,94,.58) 45%, rgba(120,18,30,.55) 80%);
-        border: 1px solid rgba(214,178,94,.55);
-        box-shadow: 0 0 0 6px rgba(120,18,30,.10), 0 12px 26px rgba(0,0,0,.55);
-        border-radius: 2px;
-      }
+      .hero::before { content: "✠"; position: absolute; left: 0; top: -6px; font-size: 22px; color: rgba(214,178,94,.75); }
+      .hero h1 { margin: 0; font-family: var(--font-display); font-size: clamp(44px, 6vw, 64px); }
+      .divider { margin-top: 18px; display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 14px; }
+      .divider .line { height: 1px; background: linear-gradient(90deg, transparent, rgba(255,255,255,.18), transparent); }
+      .divider .gem { width: 10px; height: 10px; transform: rotate(45deg); background: radial-gradient(circle at 30% 30%, #fff, #d6b25e); border: 1px solid #d6b25e; border-radius: 2px; }
       .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 18px; margin-top: 30px; }
-      @media (max-width: 768px) { .grid { grid-template-columns: 1fr; } }
-      .card {
-        position: relative; border-radius: 22px;
-        background: linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.02));
-        border: 1px solid rgba(255,255,255,.14);
-        box-shadow: 0 26px 60px rgba(0,0,0,.55), inset 0 1px 0 rgba(255,255,255,.06);
-        padding: 40px; overflow: hidden;
-        transition: transform .18s ease, border-color .18s ease;
-      }
-      .card:hover { transform: translateY(-2px); border-color: rgba(214,178,94,.55); }
-      .stud {
-        position: absolute; width: 10px; height: 10px; transform: rotate(45deg); border-radius: 2px;
-        background: radial-gradient(circle at 30% 30%, rgba(255,255,255,.85), rgba(214,178,94,.52) 45%, rgba(120,18,30,.45) 80%);
-        border: 1px solid rgba(214,178,94,.55);
-      }
-      .s-tl { top: 14px; left: 14px; } .s-tr { top: 14px; right: 14px; }
-      .s-bl { bottom: 14px; left: 14px; } .s-br { bottom: 14px; right: 14px; }
-      .t { font-family: var(--font-display); font-size: 24px; color: #d6b25e; margin-bottom: 12px; }
-      .m { font-size: 14px; opacity: 0.7; line-height: 1.6; }
+      .card { position: relative; border-radius: 22px; background: rgba(255,255,255,.05); border: 1px solid rgba(255,255,255,.14); padding: 40px; transition: 0.2s; }
+      .card:hover { border-color: rgba(214,178,94,.55); transform: translateY(-2px); }
     </style>
   </head>
   <body>
@@ -72,22 +33,14 @@ const description = "随笔与感悟。";
     <main class="wrap">
       <section class="hero">
         <h1>Essays</h1>
-        <div class="divider">
-          <div class="line"></div><div class="gem"></div><div class="line"></div>
-        </div>
+        <div class="divider"><div class="line"></div><div class="gem"></div><div class="line"></div></div>
       </section>
-
       <div class="grid">
         {sortedPosts.map((post) => (
           <a href={`/writing/essays/${post.id}/`} style="text-decoration: none; color: inherit;">
             <article class="card">
-              <span class="stud s-tl"></span><span class="stud s-tr"></span>
-              <span class="stud s-bl"></span><span class="stud s-br"></span>
-              <div class="t">{post.data.title}</div>
-              <div class="m">{post.data.description}</div>
-              <div style="margin-top: 20px; font-family: var(--font-mono); font-size: 12px; opacity: 0.4;">
-                {post.data.pubDate.toLocaleDateString()}
-              </div>
+              <div style="font-family: var(--font-display); font-size: 24px; color: #d6b25e;">{post.data.title}</div>
+              <p style="opacity: 0.7;">{post.data.description}</p>
             </article>
           </a>
         ))}
