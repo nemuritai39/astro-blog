@@ -1,0 +1,37 @@
+---
+import { getCollection } from 'astro:content';
+import Header from '../../components/Header.astro';
+const moments = await getCollection('with-you');
+const PASSWORD = "你的密码"; 
+---
+
+<div id="lock">
+  <input type="password" id="pw" placeholder="输入密码进入" />
+</div>
+
+<Header />
+<main id="timeline">
+  {moments.sort((a,b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf()).map(m => (
+    <div class="moment">
+      <span class="date">{m.data.pubDate.toDateString()}</span>
+      <img src={m.data.cover} />
+      <h2>{m.data.title}</h2>
+      <p>{m.data.description}</p>
+    </div>
+  ))}
+</main>
+
+<style>
+  #lock { position: fixed; inset: 0; background: #000; z-index: 1000; display: flex; align-items: center; justify-content: center; }
+  .unlocked #lock { display: none; }
+  #timeline { padding: 150px 20px; max-width: 600px; margin: 0 auto; }
+  .moment { margin-bottom: 80px; border-left: 2px solid #d6b25e; padding-left: 30px; }
+  .date { color: #d6b25e; font-family: Cinzel; }
+  img { width: 100%; margin: 20px 0; }
+</style>
+
+<script define:vars={{ PASSWORD }}>
+  document.getElementById('pw').addEventListener('input', (e) => {
+    if (e.target.value === PASSWORD) document.body.classList.add('unlocked');
+  });
+</script>
