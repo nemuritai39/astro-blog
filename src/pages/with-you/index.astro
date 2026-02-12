@@ -5,11 +5,8 @@ import Header from '../../components/Header.astro';
 import Footer from '../../components/Footer.astro';
 import { SITE_TITLE } from '../../consts';
 
-// 搬家后 getCollection 已经能用了
 const posts = await getCollection('with-you');
-const sortedPosts = posts.sort(
-	(a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf()
-);
+const sortedPosts = posts.sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
 
 const PASSWORD = "0309"; 
 ---
@@ -20,30 +17,50 @@ const PASSWORD = "0309";
 		<BaseHead title={`With You - ${SITE_TITLE}`} />
 		<style>
 			:root { --gold: #d6b25e; --bg: #050505; }
-			html, body { background: var(--bg) !important; color: #fff; margin: 0; }
-			#gate { position: fixed; inset: 0; background: var(--bg); z-index: 10001; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+			body { background: var(--bg); color: #fff; margin: 0; overflow-x: hidden; }
+			
+			/* 密码锁屏 */
+			#gate { 
+				position: fixed; inset: 0; background: var(--bg); z-index: 10001; 
+				display: flex; flex-direction: column; align-items: center; justify-content: center; 
+			}
 			#gate.hidden { display: none; }
-			#pw-box { background: transparent; border: none; border-bottom: 1px solid var(--gold); color: #fff; text-align: center; font-size: 2rem; width: 200px; outline: none; }
-			main { max-width: 800px; margin: 0 auto; padding: 150px 24px; }
-			.memory-item { margin-bottom: 120px; text-align: center; }
-			.memory-item img { width: 100%; max-height: 75vh; object-fit: contain; margin: 2rem 0; box-shadow: 0 30px 60px rgba(0,0,0,0.5); }
-			.date { color: var(--gold); font-family: 'Cinzel', serif; letter-spacing: 0.2em; }
+			#pw-box { 
+				background: transparent; border: none; border-bottom: 1px solid var(--gold); 
+				color: #fff; text-align: center; font-size: 2rem; width: 220px; outline: none; 
+				font-family: 'Cinzel', serif;
+			}
+
+			main { max-width: 800px; margin: 0 auto; padding: 160px 24px; }
+			.memory-card { margin-bottom: 150px; text-align: center; }
+			.date { font-family: 'Cinzel', serif; color: var(--gold); letter-spacing: 0.3em; margin-bottom: 2rem; }
+			
+			.img-wrap { position: relative; display: inline-block; width: 100%; }
+			.memory-card img { 
+				width: 100%; height: auto; max-height: 75vh; object-fit: contain;
+				box-shadow: 0 30px 80px rgba(0,0,0,0.8); border: 1px solid rgba(214,178,94,0.1);
+			}
+			
+			h2 { font-family: 'Cinzel', serif; font-size: 1.8rem; margin: 1.5rem 0; font-weight: 400; }
+			.desc { font-family: 'EB Garamond', serif; color: rgba(255,255,255,0.5); font-style: italic; font-size: 1.1rem; }
 		</style>
 	</head>
 	<body>
 		<div id="gate">
-			<p style="color: var(--gold); letter-spacing: 0.5em; font-family: 'Cinzel'; margin-bottom: 2rem;">PASSCODE</p>
-			<input type="password" id="pw-box" autofocus />
+			<p style="color: var(--gold); letter-spacing: 0.5em; font-family: 'Cinzel'; margin-bottom: 2rem; font-size: 0.7rem;">PRIVATE ARCHIVE</p>
+			<input type="password" id="pw-box" autofocus placeholder="••••" />
 		</div>
 
 		<Header />
 		<main>
 			{sortedPosts.map((post) => (
-				<div class="memory-item">
+				<div class="memory-card">
 					<div class="date">{post.data.pubDate.toDateString()}</div>
-					<img src={post.data.cover} alt={post.data.title} />
-					<h2 style="font-family: 'Cinzel';">{post.data.title}</h2>
-					{post.data.description && <p style="opacity:0.5">{post.data.description}</p>}
+					<div class="img-wrap">
+						<img src={post.data.cover} alt={post.data.title} />
+					</div>
+					<h2>{post.data.title}</h2>
+					{post.data.description && <p class="desc">{post.data.description}</p>}
 				</div>
 			))}
 		</main>
@@ -53,9 +70,7 @@ const PASSWORD = "0309";
 			const gate = document.getElementById('gate');
 			const input = document.getElementById('pw-box');
 			input.addEventListener('input', (e) => {
-				if (e.target.value === PASSWORD) {
-					gate.classList.add('hidden');
-				}
+				if (e.target.value === PASSWORD) gate.classList.add('hidden');
 			});
 		</script>
 	</body>
