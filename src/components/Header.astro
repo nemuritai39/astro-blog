@@ -1,6 +1,9 @@
 ---
-import HeaderLink from './HeaderLink.astro';
 import { SITE_TITLE } from '../consts';
+
+// 获取当前路径，用于判断哪个标签是激活状态
+const { pathname } = Astro.url;
+const isActive = (path: string) => path === pathname || path === pathname.replace(/\/$/, '');
 ---
 
 <header id="main-header">
@@ -10,10 +13,10 @@ import { SITE_TITLE } from '../consts';
 				<a href="/">{SITE_TITLE}</a>
 			</div>
 			<div class="internal-links">
-				<HeaderLink href="/">Index</HeaderLink>
-				<HeaderLink href="/writing">Writing</HeaderLink>
-				<HeaderLink href="/gallery">Gallery</HeaderLink>
-				<HeaderLink href="/about">About</HeaderLink>
+				<a href="/" class={isActive('/') ? 'active' : ''}>Index</a>
+				<a href="/writing" class={isActive('/writing') ? 'active' : ''}>Writing</a>
+				<a href="/gallery" class={isActive('/gallery') ? 'active' : ''}>Gallery</a>
+				<a href="/about" class={isActive('/about') ? 'active' : ''}>About</a>
 			</div>
 		</div>
 	</nav>
@@ -26,27 +29,23 @@ import { SITE_TITLE } from '../consts';
 		left: 0;
 		width: 100%;
 		z-index: 1000;
-		/* 初始状态：半透明深色，带有一条极细的底线 */
-		background: rgba(0, 0, 0, 0.2);
+		background: rgba(0, 0, 0, 0.3); /* 初始微弱背景，确保可见 */
 		backdrop-filter: blur(0px);
-		border-bottom: 1px solid rgba(255, 255, 255, 0);
 		transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
-		padding: 40px 0;
+		padding: 35px 0;
 	}
 
-	/* 滚动后的“凝固”状态 */
 	header.scrolled {
 		padding: 18px 0;
 		background: rgba(10, 10, 10, 0.8);
 		backdrop-filter: blur(20px);
-		border-bottom: 1px solid rgba(214, 178, 94, 0.2); /* 淡淡的金边 */
-		box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+		border-bottom: 1px solid rgba(214, 178, 94, 0.2);
 	}
 
 	nav {
 		max-width: 1200px;
 		margin: 0 auto;
-		padding: 0 30px;
+		padding: 0 40px;
 	}
 
 	.nav-container {
@@ -57,45 +56,50 @@ import { SITE_TITLE } from '../consts';
 
 	.logo a {
 		font-family: 'Cinzel', serif;
-		font-size: 0.9rem;
+		font-size: 1rem;
 		font-weight: 700;
 		color: #fff;
 		text-decoration: none;
 		letter-spacing: 0.3em;
 		text-transform: uppercase;
-		opacity: 0.9;
 	}
 
 	.internal-links {
 		display: flex;
-		gap: 3.5rem;
+		gap: 3rem;
 	}
 
-	/* 导航链接：确保可见度 */
-	.internal-links :global(a) {
+	/* 重点：强制让标签显示的样式 */
+	.internal-links a {
+		display: inline-block;
 		font-family: 'Cinzel', serif;
-		font-size: 0.75rem;
+		font-size: 0.8rem;
 		text-transform: uppercase;
 		letter-spacing: 0.2em;
-		color: rgba(255, 255, 255, 0.6); /* 初始灰色 */
+		color: rgba(255, 255, 255, 0.6); /* 没选中的时候是淡灰色 */
 		text-decoration: none;
 		position: relative;
 		transition: all 0.3s ease;
 		padding: 5px 0;
 	}
 
-	/* 悬停和激活状态 */
-	.internal-links :global(a:hover),
-	.internal-links :global(a.active) {
+	/* 悬停效果 */
+	.internal-links a:hover {
+		color: #fff;
+		opacity: 1;
+	}
+
+	/* 选中状态（激活态） */
+	.internal-links a.active {
 		color: var(--accent-gold, #d6b25e);
 		opacity: 1;
 	}
 
-	/* 激活状态的小原点（比下划线更显灵性） */
-	.internal-links :global(a.active::after) {
+	/* 激活态的小金点 */
+	.internal-links a.active::after {
 		content: '';
 		position: absolute;
-		bottom: -8px;
+		bottom: -5px;
 		left: 50%;
 		transform: translateX(-50%);
 		width: 4px;
@@ -106,29 +110,19 @@ import { SITE_TITLE } from '../consts';
 	}
 
 	@media (max-width: 768px) {
-		header { padding: 25px 0; }
 		.logo { display: none; }
-		.internal-links { width: 100%; justify-content: space-around; gap: 0; }
+		.internal-links { width: 100%; justify-content: center; gap: 1.5rem; }
+		.internal-links a { font-size: 0.7rem; }
 	}
 </style>
 
 <script>
-	// 确保在 Astro 页面切换时也能重新执行
-	const initHeader = () => {
-		const header = document.getElementById('main-header');
-		const handleScroll = () => {
-			if (window.scrollY > 20) {
-				header?.classList.add('scrolled');
-			} else {
-				header?.classList.remove('scrolled');
-			}
-		};
-		window.addEventListener('scroll', handleScroll);
-		// 初始执行一次
-		handleScroll();
-	};
-
-	initHeader();
-	// 针对 Astro 的视图过渡（如果开启了的话）
-	document.addEventListener('astro:after-swap', initHeader);
+	const header = document.getElementById('main-header');
+	window.addEventListener('scroll', () => {
+		if (window.scrollY > 20) {
+			header?.classList.add('scrolled');
+		} else {
+			header?.classList.remove('scrolled');
+		}
+	});
 </script>
