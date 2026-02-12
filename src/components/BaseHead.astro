@@ -1,24 +1,28 @@
 ---
-type Props = {
+// 定义 Props 类型，增加可选性以防报错
+interface Props {
   title?: string;
   description?: string;
-  canonicalURL?: URL;
-};
+  canonicalURL?: string | URL;
+}
 
+// 设定默认值，确保即便父组件没传值，页面也不会崩溃
 const {
   title = "nemu · archive",
   description = "nemu · archive",
   canonicalURL = Astro.url,
-} = Astro.props as Props;
+} = Astro.props;
+
+// 确保 canonicalURL 始终是字符串格式
+const canonicalURLString = new URL(canonicalURL, Astro.site).toString();
 ---
 
-<!-- Global Metadata -->
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
 <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 <link rel="icon" href="/favicon.ico" />
+<meta name="generator" content={Astro.generator} />
 
-<!-- Fonts: medieval but readable -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link
@@ -26,25 +30,20 @@ const {
   rel="stylesheet"
 />
 
-<!-- Global CSS -->
-<link rel="stylesheet" href="/global.css?v=4" />
+<link rel="stylesheet" href="/global.css" />
 
-<!-- Canonical -->
-<link rel="canonical" href={canonicalURL.toString()} />
+<link rel="canonical" href={canonicalURLString} />
 
-<!-- Primary Meta Tags -->
 <title>{title}</title>
 <meta name="title" content={title} />
 <meta name="description" content={description} />
 
-<!-- Open Graph -->
 <meta property="og:type" content="website" />
-<meta property="og:url" content={canonicalURL.toString()} />
+<meta property="og:url" content={canonicalURLString} />
 <meta property="og:title" content={title} />
 <meta property="og:description" content={description} />
 
-<!-- Twitter -->
 <meta property="twitter:card" content="summary_large_image" />
-<meta property="twitter:url" content={canonicalURL.toString()} />
+<meta property="twitter:url" content={canonicalURLString} />
 <meta property="twitter:title" content={title} />
 <meta property="twitter:description" content={description} />
