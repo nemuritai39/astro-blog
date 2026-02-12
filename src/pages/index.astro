@@ -17,7 +17,7 @@ import { SITE_TITLE, SITE_DESCRIPTION } from '../consts';
 				padding: 60px 20px;
 			}
 
-			/* 标题区域：祭坛顶部 */
+			/* 标题区域 */
 			.hero-section {
 				text-align: center;
 				margin-bottom: 80px;
@@ -38,7 +38,7 @@ import { SITE_TITLE, SITE_DESCRIPTION } from '../consts';
 				display: block;
 			}
 
-			/* 祭坛卡片网格：解决排版不均 */
+			/* 祭坛网格布局 */
 			.altar-grid {
 				display: grid;
 				grid-template-columns: repeat(3, 1fr);
@@ -51,160 +51,106 @@ import { SITE_TITLE, SITE_DESCRIPTION } from '../consts';
 				}
 			}
 
-			/* 祭坛卡片基础样式 */
+			/* 通用卡片基础 */
 			.temple-card {
 				position: relative;
-				background: linear-gradient(145deg, rgba(30,30,35,0.8), rgba(15,15,18,0.95));
-				border: 1px solid rgba(214, 178, 94, 0.15);
-				border-radius: 4px; /* 稍微方正一点更有碑林感 */
-				padding: 50px 30px;
+				background: linear-gradient(145deg, rgba(20,20,25,0.9), rgba(5,5,8,0.98));
+				border: 1px solid rgba(255, 255, 255, 0.05);
+				border-radius: 4px;
+				padding: 60px 30px;
 				text-align: center;
 				text-decoration: none;
-				transition: all 0.5s cubic-bezier(0.22, 1, 0.36, 1);
-				overflow: hidden;
+				transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
 				display: flex;
 				flex-direction: column;
 				align-items: center;
 				justify-content: center;
 			}
 
-			/* 悬停效果：神圣光晕 */
 			.temple-card:hover {
-				border-color: rgba(214, 178, 94, 0.5);
 				transform: translateY(-10px);
-				box-shadow: 0 15px 40px rgba(0, 0, 0, 0.8), 0 0 20px rgba(214, 178, 94, 0.1);
-			}
-
-			.temple-card::before {
-				content: '';
-				position: absolute;
-				top: 0; left: 0; width: 100%; height: 100%;
-				background: radial-gradient(circle at center, rgba(214, 178, 94, 0.05) 0%, transparent 70%);
-				opacity: 0;
-				transition: opacity 0.5s;
-			}
-			.temple-card:hover::before {
-				opacity: 1;
 			}
 
 			.temple-card h2 {
 				font-family: 'Cinzel', serif;
-				color: #d6b25e;
 				font-size: 1.8rem;
 				letter-spacing: 0.15em;
 				margin: 20px 0;
-				z-index: 1;
+				transition: color 0.4s;
 			}
 
 			.temple-card p {
 				font-family: 'Cormorant Garamond', serif;
 				font-style: italic;
-				color: rgba(255, 255, 255, 0.45);
+				color: rgba(255, 255, 255, 0.4);
 				font-size: 1.1rem;
 				line-height: 1.6;
-				z-index: 1;
 				max-width: 240px;
 			}
 
-			/* 装饰性的小十字星 */
 			.stud {
 				width: 8px; height: 8px;
-				background: #d6b25e;
 				transform: rotate(45deg);
 				margin-bottom: 10px;
-				opacity: 0.6;
+				transition: all 0.4s;
 			}
-<style>
-  /* 基础网格布局 */
-  .altar-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 30px;
-  }
 
-  /* 基础卡片样式 - 移除全局金色边框，改为半透明白 */
-  .temple-card {
-    position: relative;
-    background: linear-gradient(145deg, rgba(25,25,30,0.9), rgba(10,10,12,0.98));
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    border-radius: 4px;
-    padding: 60px 30px;
-    text-align: center;
-    text-decoration: none;
-    transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
-    overflow: hidden;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-  }
+			/* --- 三个卡片各自的灵魂色彩 --- */
 
-  /* --- 分别定义三个卡片的颜色性格 --- */
+			/* 1. Writing - 墨蓝 (Ink Blue) */
+			.card-writing:hover {
+				border-color: rgba(70, 130, 180, 0.4);
+				box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), 0 0 20px rgba(70, 130, 180, 0.1);
+			}
+			.card-writing h2 { color: #a0c4ff; }
+			.card-writing .stud { background: #4682b4; box-shadow: 0 0 10px #4682b4; }
 
-  /* 1. Writing - 墨蓝 (Ink Blue) */
-  .card-writing:hover {
-    border-color: rgba(100, 149, 237, 0.4);
-    box-shadow: 0 0 30px rgba(65, 105, 225, 0.15);
-  }
-  .card-writing h2 { color: #87ceeb; text-shadow: 0 0 10px rgba(135, 206, 235, 0.3); }
-  .card-writing .stud { background: #4682b4; }
+			/* 2. Gallery - 枯绿 (Moss Green) */
+			.card-gallery:hover {
+				border-color: rgba(85, 107, 47, 0.4);
+				box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), 0 0 20px rgba(85, 107, 47, 0.1);
+			}
+			.card-gallery h2 { color: #b7d892; }
+			.card-gallery .stud { background: #556b2f; box-shadow: 0 0 10px #556b2f; }
 
-  /* 2. Gallery - 枯绿 (Moss Green) */
-  .card-gallery:hover {
-    border-color: rgba(143, 188, 143, 0.4);
-    box-shadow: 0 0 30px rgba(85, 107, 47, 0.15);
-  }
-  .card-gallery h2 { color: #9ab973; text-shadow: 0 0 10px rgba(154, 185, 115, 0.3); }
-  .card-gallery .stud { background: #556b2f; }
+			/* 3. With You - 暗紫 (Void Purple) */
+			.card-with-you:hover {
+				border-color: rgba(106, 90, 205, 0.4);
+				box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), 0 0 20px rgba(106, 90, 205, 0.1);
+			}
+			.card-with-you h2 { color: #c3b1e1; }
+			.card-with-you .stud { background: #6a5acd; box-shadow: 0 0 10px #6a5acd; }
 
-  /* 3. With You - 暗紫 (Void Purple) */
-  .card-with-you:hover {
-    border-color: rgba(147, 112, 219, 0.4);
-    box-shadow: 0 0 30px rgba(138, 43, 226, 0.15);
-  }
-  .card-with-you h2 { color: #b39ddb; text-shadow: 0 0 10px rgba(179, 157, 219, 0.3); }
-  .card-with-you .stud { background: #673ab7; }
+		</style>
+	</head>
+	<body>
+		<Header />
+		<main>
+			<section class="hero-section">
+				<span class="mark">✠</span>
+				<h1>NEMU · ARCHIVE</h1>
+			</section>
 
-  /* 共同样式微调 */
-  .temple-card h2 {
-    font-family: 'Cinzel', serif;
-    font-size: 1.7rem;
-    letter-spacing: 0.2em;
-    margin: 15px 0;
-    transition: 0.4s;
-  }
+			<div class="altar-grid">
+				<a href="/writing" class="temple-card card-writing">
+					<div class="stud"></div>
+					<h2>WRITING</h2>
+					<p>“ 在墨痕的间隙，捕捉灵魂碎裂的低语。”</p>
+				</a>
 
-  .temple-card p {
-    font-family: 'Cormorant Garamond', serif;
-    font-style: italic;
-    color: rgba(255, 255, 255, 0.4);
-    font-size: 1.05rem;
-    line-height: 1.6;
-    max-width: 220px;
-  }
+				<a href="/gallery" class="temple-card card-gallery">
+					<div class="stud"></div>
+					<h2>GALLERY</h2>
+					<p>“ 光影的残像，是时间在这个世界留下的唯一证词。”</p>
+				</a>
 
-  .stud {
-    width: 6px; height: 6px;
-    transform: rotate(45deg);
-    margin-bottom: 15px;
-  }
-</style>
-
-<div class="altar-grid">
-  <a href="/writing" class="temple-card card-writing">
-    <div class="stud"></div>
-    <h2>WRITING</h2>
-    <p>“ 在墨痕的间隙，捕捉灵魂碎裂的低语。”</p>
-  </a>
-
-  <a href="/gallery" class="temple-card card-gallery">
-    <div class="stud"></div>
-    <h2>GALLERY</h2>
-    <p>“ 光影的残像，是时间在这个世界留下的唯一证词。”</p>
-  </a>
-
-  <a href="/with-you" class="temple-card card-with-you">
-    <div class="stud"></div>
-    <h2>WITH YOU</h2>
-    <p>“ 跨越禁忌的边界，于虚无中与你同频。”</p>
-  </a>
-</div>
+				<a href="/with-you" class="temple-card card-with-you">
+					<div class="stud"></div>
+					<h2>WITH YOU</h2>
+					<p>“ 跨越禁忌的边界，于虚无中与你同频。”</p>
+				</a>
+			</div>
+		</main>
+		<Footer />
+	</body>
+</html>
