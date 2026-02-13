@@ -4,19 +4,23 @@ import BaseHead from '@/components/BaseHead.astro';
 import Header from '@/components/Header.astro';
 import Footer from '@/components/Footer.astro';
 
+// 1. 核心逻辑：修复路由，确保 URL 不带 .md 后缀
 export async function getStaticPaths() {
-	const categories = ['essays', 'thinking', 'poems', 'goals'];
+	const categories = ['essays', 'thinking', 'poems', 'goals'] as const;
 	const allPaths = await Promise.all(
 		categories.map(async (cat) => {
-			const posts = await getCollection(cat as any);
-			return posts.map(post => ({
-				params: { 
-					category: cat,
-					// 使用 replace 确保 slug 不带后缀名，解决 404 隐患
-					slug: post.id.replace(/\.[^/.]+$/, "") 
-				},
-				props: { post },
-			}));
+			const posts = await getCollection(cat);
+			return posts.map(post => {
+				// 【核心修复】必须去掉文件名后缀，否则 URL 匹配不上
+				const cleanSlug = post.id.replace(/\.[^/.]+$/, ""); 
+				return {
+					params: { 
+						category: cat,
+						slug: cleanSlug
+					},
+					props: { post },
+				};
+			});
 		})
 	);
 	return allPaths.flat();
@@ -26,6 +30,7 @@ const { post } = Astro.props;
 const { category } = Astro.params;
 const { Content } = await render(post);
 
+// 2. 视觉主题配置
 const themes = {
 	essays: { color: 'var(--ivory)', name: '随笔' },
 	poems: { color: 'var(--silver)', name: '诗歌' },
@@ -39,6 +44,7 @@ const currentTheme = themes[category as keyof typeof themes] || themes.essays;
 	<head>
 		<BaseHead title={post.data.title} description={post.data.description} />
 		<style define:vars={{ themeColor: currentTheme.color }}>
+			/* 顶部进度条 */
 			#progress-bar { 
 				position: fixed; top: 0; left: 0; 
 				width: 0%; height: 2px; 
@@ -48,93 +54,106 @@ const currentTheme = themes[category as keyof typeof themes] || themes.essays;
 			}
 
 			main { 
-				max-width: 750px; 
+				max-width: 700px; 
 				margin: 0 auto; 
-				padding: 100px 24px; 
+				padding: 80px 24px; 
 			}
 
-			.article-header { text-align: center; margin-bottom: 5em; }
-			
+			/* 文章头部 */
+			.article-header { 
+				text-align: center; 
+				margin-bottom: 5em; 
+			}
 			.category-tag { 
 				font-family: 'Cinzel', serif; 
-				font-size: 0.7rem; 
+				font-size: 0.75rem; 
 				letter-spacing: 0.5em; 
 				color: var(--themeColor); 
-				opacity: 0.6;
+				opacity: 0.5;
 				text-transform: uppercase;
 				display: block;
-				margin-bottom: 2em;
+				margin-bottom: 1.5em;
 			}
-
 			.article-header h1 { 
 				font-family: 'Cinzel', serif; 
-				font-size: clamp(1.8rem, 5vw, 2.4rem); 
-				color: #fff; 
+				font-size: clamp(1.8rem, 5vw, 2.2rem); 
+				color: #F5F7FA; 
 				font-weight: 400;
-				line-height: 1.3;
+				line-height: 1.4;
 			}
 
-			/* 基础排版 */
+			/* --- 正文排版 --- */
 			.prose { 
 				font-family: 'EB Garamond', 'Noto Serif SC', serif; 
-				font-size: 1.2rem; 
-				line-height: 1.8; 
-				color: rgba(255, 255, 255, 0.8); 
+				font-size: 1.25rem; 
+				line-height: 1.9; 
+				color: rgba(255, 255, 255, 0.85); 
 			}
 
-			/* --- 诗歌模式：核心修正 --- */
-			.is-poems { 
-				display: flex;
-				flex-direction: column;
-				align-items: center; /* 容器居中 */
-				text-align: left;
+			/* 随笔/思考模式：两端对齐 + 首字下沉 */
+			.prose:not(.is-poems) {
+				text-align: justify;
+				word-break: break-word;
 			}
-
-			.is-poems :global(p) { 
-				width: fit-content; /* 宽度随文字走 */
-				min-width: 260px;   /* 设定一个最小宽度，保证视觉平衡 */
-				margin-bottom: 1.2rem;
-				text-align: left; /* 内部文字齐头 */
-				letter-spacing: 0.1em;
-			}
-
-			/* 诗歌的小节空行 */
-			.is-poems :global(p:empty) { height: 2.5em; }
-
-			/* 非诗歌：保持首字下沉和两端对齐 */
-			.prose:not(.is-poems) { text-align: justify; }
 			.prose:not(.is-poems) :global(p:first-of-type::first-letter) {
 				font-family: 'Cinzel', serif;
-				font-size: 3rem;
+				font-size: 3.5rem;
 				float: left;
 				line-height: 1;
-				padding-right: 10px;
+				padding-right: 12px;
 				color: var(--themeColor);
 			}
 
+			/* --- 诗歌模式：现代诗排版修正 --- */
+			.is-poems { 
+				display: flex;
+				flex-direction: column;
+				align-items: center; /* 容器整体居中 */
+				text-align: left;
+			}
+			.is-poems :global(p) { 
+				margin-bottom: 1.5rem; 
+				text-align: left; /* 内部文字左对齐 */
+				width: fit-content; 
+				min-width: 240px; /* 保证视觉重心在中间 */
+				max-width: 100%;
+				letter-spacing: 0.1em;
+			}
+
+			/* 引文排版 */
+			.prose :global(blockquote) {
+				margin: 3em auto;
+				padding: 1.5em;
+				border-left: 2px solid var(--themeColor);
+				background: rgba(255, 255, 255, 0.03);
+				font-style: italic;
+				color: rgba(255, 255, 255, 0.9);
+			}
+
+			/* 底部导航 */
 			.post-footer {
-				margin-top: 8em;
-				padding-top: 3em;
+				margin-top: 6em;
+				padding-top: 2em;
 				border-top: 1px solid rgba(255, 255, 255, 0.05);
 				text-align: center;
 			}
-
 			.back-link {
 				font-family: 'Cinzel', serif;
 				font-size: 0.8rem;
-				color: #fff;
+				color: rgba(255, 255, 255, 0.4);
 				text-decoration: none;
-				letter-spacing: 0.3em;
-				opacity: 0.4;
+				letter-spacing: 0.2em;
 				transition: 0.3s;
 			}
-
-			.back-link:hover { opacity: 1; color: var(--themeColor); }
+			.back-link:hover {
+				color: var(--themeColor);
+				opacity: 1;
+			}
 
 			@media (max-width: 720px) {
-				main { padding: 60px 20px; }
-				.is-poems { align-items: flex-start; padding-left: 5%; }
-				.is-poems :global(p) { min-width: auto; width: 100%; }
+				main { padding: 40px 20px; }
+				.is-poems { align-items: flex-start; padding-left: 10%; }
+				.is-poems :global(p) { min-width: auto; }
 			}
 		</style>
 	</head>
@@ -151,18 +170,20 @@ const currentTheme = themes[category as keyof typeof themes] || themes.essays;
 					<Content />
 				</div>
 			</article>
+
 			<footer class="post-footer">
-				<a href={`/writing/${category}`} class="back-link">← RETURN</a>
+				<a href={`/writing/${category}`} class="back-link">
+					← BACK TO {currentTheme.name}
+				</a>
 			</footer>
 		</main>
 		<script>
 			const bar = document.getElementById("progress-bar");
 			window.onscroll = () => {
-				const h = document.documentElement;
-				const st = h.scrollTop || document.body.scrollTop;
-				const sh = h.scrollHeight || document.body.scrollHeight;
-				const pct = (st / (sh - h.clientHeight)) * 100;
-				if (bar) bar.style.width = pct + "%";
+				const winScroll = document.documentElement.scrollTop;
+				const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+				const scrolled = (winScroll / height) * 100;
+				if (bar) bar.style.width = scrolled + "%";
 			};
 		</script>
 		<Footer />
