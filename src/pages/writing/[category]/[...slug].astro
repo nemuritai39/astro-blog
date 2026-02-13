@@ -9,13 +9,10 @@ export async function getStaticPaths() {
 	const allPaths = await Promise.all(
 		categories.map(async (cat) => {
 			const posts = await getCollection(cat);
-			return posts.map(post => {
-				const cleanSlug = post.id.replace(/\.[^/.]+$/, ""); 
-				return {
-					params: { category: cat, slug: cleanSlug },
-					props: { post },
-				};
-			});
+			return posts.map(post => ({
+				params: { category: cat, slug: post.id.replace(/\.[^/.]+$/, "") },
+				props: { post },
+			}));
 		})
 	);
 	return allPaths.flat();
@@ -25,7 +22,6 @@ const { post } = Astro.props;
 const { category } = Astro.params;
 const { Content } = await render(post);
 
-// 视觉主题：直接定义颜色，确保 CSS 变量能精准读取
 const themes = {
 	essays: { color: '#E2E2E2', name: '随笔' },
 	poems: { color: '#C0C0C0', name: '诗歌' },
@@ -37,64 +33,38 @@ const currentTheme = themes[category as keyof typeof themes] || themes.essays;
 
 <html lang="en">
 	<head>
-		<BaseHead title={post.data.title} description={post.data.description} />
+		<BaseHead title={post.data.title} />
 		<style define:vars={{ themeColor: currentTheme.color }}>
-			/* 进度条保持 */
 			#progress-bar { position: fixed; top: 0; left: 0; width: 0%; height: 2px; background: var(--themeColor); z-index: 10000; }
-
 			main { max-width: 800px; margin: 0 auto; padding: 100px 24px; }
-
-			/* 文章头部 */
 			.article-header { text-align: center; margin-bottom: 5em; }
 			.category-tag { font-family: 'Cinzel', serif; font-size: 0.7rem; letter-spacing: 0.5em; color: var(--themeColor); opacity: 0.5; display: block; margin-bottom: 1.5em; }
 			.article-header h1 { font-family: 'Cinzel', serif; font-size: 2.2rem; color: #fff; font-weight: 400; }
 
-			/* --- 正文核心排版 --- */
-			.prose { 
-				font-family: 'EB Garamond', 'Noto Serif SC', serif; 
-				font-size: 1.2rem; line-height: 2; 
-				color: rgba(255, 255, 255, 0.8); 
-			}
+			.prose { font-family: 'EB Garamond', 'Noto Serif SC', serif; font-size: 1.2rem; line-height: 2.2; color: rgba(255, 255, 255, 0.85); }
 
-			/* 1. 修复引文：恢复那种带颜色的独特字体感 */
+			/* 引文排版 */
 			.prose :global(blockquote) {
-				margin: 5em auto;
-				padding: 2em 0;
-				border-top: 1px solid rgba(255, 255, 255, 0.08);
-				border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-				text-align: center;
-				font-style: italic;
-				/* 核心颜色修复 */
-				color: var(--themeColor); 
-				font-family: 'Cormorant Garamond', serif;
-				opacity: 0.9;
+				margin: 4em auto; padding: 2em 0;
+				border-top: 1px solid rgba(255, 255, 255, 0.1);
+				border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+				text-align: center; font-style: italic;
+				color: var(--themeColor); font-family: 'Cormorant Garamond', serif;
 			}
-			.prose :global(blockquote p) { font-size: 1.3rem; letter-spacing: 0.05em; }
 
-			/* 2. 修复诗歌：改回全居中排版 */
-			.is-poems { 
-				text-align: center; 
-			}
-			.is-poems :global(p) { 
-				margin-bottom: 1.8rem; 
-				letter-spacing: 0.15em;
-				/* 确保诗歌行间距足够优雅 */
-			}
-			.is-poems :global(p:empty) { height: 2.5em; }
+			/* 诗歌排版：恢复你截图里的居中感 */
+			.is-poems { text-align: center; }
+			.is-poems :global(p) { margin-bottom: 1.5rem; letter-spacing: 0.1em; }
+			.is-poems :global(p:empty) { height: 2em; }
 
-			/* 3. 修复随笔：首字下沉颜色 */
+			/* 随笔排版：首字下沉 */
 			.prose:not(.is-poems) :global(p:first-of-type::first-letter) {
-				font-family: 'Cinzel', serif;
-				font-size: 3.5rem;
-				float: left;
-				line-height: 1;
-				padding-right: 12px;
-				color: var(--themeColor);
+				font-family: 'Cinzel', serif; font-size: 3.5rem; float: left;
+				line-height: 1; padding-right: 12px; color: var(--themeColor);
 			}
 
-			.post-footer { margin-top: 8em; padding-top: 2em; border-top: 1px solid rgba(255, 255, 255, 0.05); text-align: center; }
-			.back-link { font-family: 'Cinzel', serif; font-size: 0.8rem; color: rgba(255, 255, 255, 0.3); text-decoration: none; letter-spacing: 0.2em; }
-			.back-link:hover { color: var(--themeColor); }
+			.post-footer { margin-top: 8em; text-align: center; border-top: 1px solid rgba(255, 255, 255, 0.05); padding-top: 2em; }
+			.back-link { font-family: 'Cinzel', serif; font-size: 0.8rem; color: rgba(255, 255, 255, 0.3); text-decoration: none; }
 		</style>
 	</head>
 	<body>
