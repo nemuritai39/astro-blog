@@ -104,13 +104,47 @@ const currentTheme = themes[category as keyof typeof themes] || themes.essays;
 			}
 
 			/* 诗歌模式排版 */
+			/* --- 诗歌模式排版：从“广播体操”变成“艺术画廊” --- */
 			.is-poems { 
-				text-align: center; 
-				letter-spacing: 0.08em;
+			    /* 1. 核心变化：取消全员居中，改为左对齐 */
+    			text-align: left; 
+    			letter-spacing: 0.12em; /* 稍微增加字间距，更有空灵感 */
+    
+   			 /* 2. 容器居中技巧：让内容宽度自适应，然后通过 margin 居中 */
+   			 display: flex;
+  			  flex-direction: column;
+    		  align-items: center; /* 这会让内部的 p 标签整体在页面中心对齐 */
 			}
+
 			.is-poems :global(p) { 
-				margin-bottom: 2.5rem; 
-				text-align: center;
+    			margin-bottom: 1.5rem; /* 减小段落间距，让诗句更紧凑 */
+    			text-align: left; /* 确保文字左对齐 */
+    
+   			 /* 3. 给诗句设置一个合理的宽度或最小宽度 */
+  			  	width: fit-content; 
+    			min-width: 200px; 
+    			max-width: 100%;
+    
+    		/* 增加一种“手写感”的细节：如果是长句，换行时稍微缩进 */
+    			padding-left: 2em;
+    			text-indent: -2em;
+			}
+
+			/* 诗歌的小节（空行）处理 */
+			.is-poems :global(p:empty) {
+    			height: 2em;
+			}
+
+			/* 针对手机端的优化 */
+			@media (max-width: 720px) {
+    			.is-poems {
+        			align-items: flex-start; /* 手机端由于屏幕窄，靠左对齐比居中更舒服 */
+       				padding-left: 10%; /* 稍微留点左边距即可 */
+    			}
+    			.is-poems :global(p) {
+        			font-size: 1.1rem;
+        			line-height: 1.8;
+    			}
 			}
 
 			/* 引文排版：极简线条感 */
