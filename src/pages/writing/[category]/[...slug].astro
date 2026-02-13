@@ -4,7 +4,6 @@ import BaseHead from '@/components/BaseHead.astro';
 import Header from '@/components/Header.astro';
 import Footer from '@/components/Footer.astro';
 
-// 1. 核心逻辑：定义内容路由
 export async function getStaticPaths() {
 	const categories = ['essays', 'thinking', 'poems', 'goals'];
 	const allPaths = await Promise.all(
@@ -13,7 +12,8 @@ export async function getStaticPaths() {
 			return posts.map(post => ({
 				params: { 
 					category: cat,
-					slug: post.id
+					// 使用 replace 确保 slug 不带后缀名，解决 404 隐患
+					slug: post.id.replace(/\.[^/.]+$/, "") 
 				},
 				props: { post },
 			}));
@@ -26,7 +26,6 @@ const { post } = Astro.props;
 const { category } = Astro.params;
 const { Content } = await render(post);
 
-// 2. 视觉主题配置
 const themes = {
 	essays: { color: 'var(--ivory)', name: '随笔' },
 	poems: { color: 'var(--silver)', name: '诗歌' },
@@ -40,7 +39,6 @@ const currentTheme = themes[category as keyof typeof themes] || themes.essays;
 	<head>
 		<BaseHead title={post.data.title} description={post.data.description} />
 		<style define:vars={{ themeColor: currentTheme.color }}>
-			/* 顶部进度条 */
 			#progress-bar { 
 				position: fixed; top: 0; left: 0; 
 				width: 0%; height: 2px; 
@@ -50,164 +48,93 @@ const currentTheme = themes[category as keyof typeof themes] || themes.essays;
 			}
 
 			main { 
-				max-width: 680px; 
+				max-width: 750px; 
 				margin: 0 auto; 
 				padding: 100px 24px; 
 			}
 
-			/* 文章头部设计 */
-			.article-header { 
-				text-align: center; 
-				margin-bottom: 6em; 
-			}
+			.article-header { text-align: center; margin-bottom: 5em; }
+			
 			.category-tag { 
 				font-family: 'Cinzel', serif; 
-				font-size: 0.75rem; 
+				font-size: 0.7rem; 
 				letter-spacing: 0.5em; 
 				color: var(--themeColor); 
-				opacity: 0.5;
+				opacity: 0.6;
 				text-transform: uppercase;
 				display: block;
-				margin-bottom: 1.5em;
+				margin-bottom: 2em;
 			}
+
 			.article-header h1 { 
 				font-family: 'Cinzel', serif; 
-				font-size: clamp(1.8rem, 5vw, 2.2rem); 
-				color: var(--ivory); 
+				font-size: clamp(1.8rem, 5vw, 2.4rem); 
+				color: #fff; 
 				font-weight: 400;
-				line-height: 1.4;
+				line-height: 1.3;
 			}
 
-			/* 正文排版法则 */
+			/* 基础排版 */
 			.prose { 
 				font-family: 'EB Garamond', 'Noto Serif SC', serif; 
-				font-size: 1.25rem; 
-				line-height: 1.9; 
+				font-size: 1.2rem; 
+				line-height: 1.8; 
 				color: rgba(255, 255, 255, 0.8); 
-				text-align: justify;
-				word-break: break-word;
 			}
 
-			/* 段落间距 */
-			.prose :global(p) {
-				margin-bottom: 2.2rem;
-			}
-
-			/* 智能首字下沉：仅在非诗歌分类生效 */
-			.prose:not(.is-poems) :global(p:first-of-type::first-letter) {
-				font-family: 'Cinzel', serif;
-				font-size: 1.9rem;
-				font-weight: 700;
-				color: var(--themeColor);
-				padding-right: 0.15em;
-				vertical-align: baseline;
-			}
-
-			/* 诗歌模式排版 */
-			/* --- 诗歌模式排版：从“广播体操”变成“艺术画廊” --- */
+			/* --- 诗歌模式：核心修正 --- */
 			.is-poems { 
-			    /* 1. 核心变化：取消全员居中，改为左对齐 */
-    			text-align: left; 
-    			letter-spacing: 0.12em; /* 稍微增加字间距，更有空灵感 */
-    
-   			 /* 2. 容器居中技巧：让内容宽度自适应，然后通过 margin 居中 */
-   			 display: flex;
-  			  flex-direction: column;
-    		  align-items: center; /* 这会让内部的 p 标签整体在页面中心对齐 */
+				display: flex;
+				flex-direction: column;
+				align-items: center; /* 容器居中 */
+				text-align: left;
 			}
 
 			.is-poems :global(p) { 
-    			margin-bottom: 1.5rem; /* 减小段落间距，让诗句更紧凑 */
-    			text-align: left; /* 确保文字左对齐 */
-    
-   			 /* 3. 给诗句设置一个合理的宽度或最小宽度 */
-  			  	width: fit-content; 
-    			min-width: 200px; 
-    			max-width: 100%;
-    
-    		/* 增加一种“手写感”的细节：如果是长句，换行时稍微缩进 */
-    			padding-left: 2em;
-    			text-indent: -2em;
-			}
-
-			/* 诗歌的小节（空行）处理 */
-			.is-poems :global(p:empty) {
-    			height: 2em;
-			}
-
-			/* 针对手机端的优化 */
-			@media (max-width: 720px) {
-    			.is-poems {
-        			align-items: flex-start; /* 手机端由于屏幕窄，靠左对齐比居中更舒服 */
-       				padding-left: 10%; /* 稍微留点左边距即可 */
-    			}
-    			.is-poems :global(p) {
-        			font-size: 1.1rem;
-        			line-height: 1.8;
-    			}
-			}
-
-			/* 引文排版：极简线条感 */
-			.prose :global(blockquote) {
-				margin: 4em auto;
-				padding: 1em 0;
-				border-top: 1px solid rgba(255, 255, 255, 0.1);
-				border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-				text-align: center; 
-				font-style: italic;
-				color: var(--themeColor);
-				max-width: 85%;
-				opacity: 0.9;
-			}
-			.prose :global(blockquote p) {
-				margin: 1em 0;
-				font-size: 1.15rem;
-			}
-
-			/* 列表排版（针对 Goals/清单） */
-			.prose :global(ul) {
-				list-style: none;
-				padding: 0;
-				margin: 2em 0;
-			}
-			.prose :global(li) {
+				width: fit-content; /* 宽度随文字走 */
+				min-width: 260px;   /* 设定一个最小宽度，保证视觉平衡 */
 				margin-bottom: 1.2rem;
-				padding-left: 1.5em;
-				position: relative;
+				text-align: left; /* 内部文字齐头 */
+				letter-spacing: 0.1em;
 			}
-			.prose :global(li::before) {
-				content: '—';
-				position: absolute;
-				left: 0;
-				opacity: 0.4;
+
+			/* 诗歌的小节空行 */
+			.is-poems :global(p:empty) { height: 2.5em; }
+
+			/* 非诗歌：保持首字下沉和两端对齐 */
+			.prose:not(.is-poems) { text-align: justify; }
+			.prose:not(.is-poems) :global(p:first-of-type::first-letter) {
+				font-family: 'Cinzel', serif;
+				font-size: 3rem;
+				float: left;
+				line-height: 1;
+				padding-right: 10px;
 				color: var(--themeColor);
 			}
 
-			/* 文章底部导航 */
 			.post-footer {
 				margin-top: 8em;
-				padding-top: 2em;
+				padding-top: 3em;
 				border-top: 1px solid rgba(255, 255, 255, 0.05);
 				text-align: center;
 			}
+
 			.back-link {
 				font-family: 'Cinzel', serif;
 				font-size: 0.8rem;
-				color: var(--ivory);
+				color: #fff;
 				text-decoration: none;
-				letter-spacing: 0.2em;
+				letter-spacing: 0.3em;
 				opacity: 0.4;
 				transition: 0.3s;
 			}
-			.back-link:hover {
-				opacity: 1;
-				color: var(--themeColor);
-			}
+
+			.back-link:hover { opacity: 1; color: var(--themeColor); }
 
 			@media (max-width: 720px) {
 				main { padding: 60px 20px; }
-				.article-header { margin-bottom: 4em; }
-				.prose { font-size: 1.15rem; text-align: left; } /* 移动端取消两端对齐避免间隙过大 */
+				.is-poems { align-items: flex-start; padding-left: 5%; }
+				.is-poems :global(p) { min-width: auto; width: 100%; }
 			}
 		</style>
 	</head>
@@ -224,22 +151,19 @@ const currentTheme = themes[category as keyof typeof themes] || themes.essays;
 					<Content />
 				</div>
 			</article>
-
 			<footer class="post-footer">
-				<a href={`/writing/${category}`} class="back-link">
-					BACK TO {currentTheme.name}
-				</a>
+				<a href={`/writing/${category}`} class="back-link">← RETURN</a>
 			</footer>
 		</main>
 		<script>
-			const updateProgress = () => {
-				const winScroll = document.documentElement.scrollTop;
-				const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
-				const scrolled = (winScroll / height) * 100;
-				const bar = document.getElementById("progress-bar");
-				if (bar) bar.style.width = scrolled + "%";
+			const bar = document.getElementById("progress-bar");
+			window.onscroll = () => {
+				const h = document.documentElement;
+				const st = h.scrollTop || document.body.scrollTop;
+				const sh = h.scrollHeight || document.body.scrollHeight;
+				const pct = (st / (sh - h.clientHeight)) * 100;
+				if (bar) bar.style.width = pct + "%";
 			};
-			window.addEventListener('scroll', updateProgress);
 		</script>
 		<Footer />
 	</body>
