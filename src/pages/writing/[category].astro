@@ -16,12 +16,10 @@ export async function getStaticPaths() {
 const { category } = Astro.params;
 const { categoryName } = Astro.props;
 
-// 获取该分类下的所有文章并按日期排序
 const posts = (await getCollection(category as any)).sort(
 	(a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf()
 );
 
-// 为不同分类匹配颜色（保持视觉统一）
 const colors = {
 	essays: 'var(--ivory)',
 	poems: 'var(--silver)',
@@ -36,62 +34,16 @@ const themeColor = colors[category as keyof typeof colors] || 'var(--accent-gold
 	<head>
 		<BaseHead title={`${categoryName} - ${SITE_TITLE}`} description={`Archives of ${category}`} />
 		<style define:vars={{ themeColor }}>
-			main {
-				max-width: 800px;
-				margin: 0 auto;
-				padding: 80px 24px;
-				min-height: 70vh;
-			}
-			.category-title {
-				font-family: 'Cinzel', serif;
-				font-size: 0.8rem;
-				letter-spacing: 0.5em;
-				color: var(--themeColor);
-				margin-bottom: 60px;
-				text-align: center;
-				opacity: 0.8;
-			}
-			.post-list {
-				list-style: none;
-				padding: 0;
-			}
-			.post-item {
-				margin-bottom: 40px;
-				transition: transform 0.3s ease;
-			}
-			.post-link {
-				text-decoration: none;
-				display: block;
-			}
-			.post-link h2 {
-				font-family: 'EB Garamond', serif;
-				font-size: 1.6rem;
-				color: #fff;
-				margin: 0 0 8px 0;
-				transition: color 0.3s ease;
-			}
-			.post-link:hover h2 {
-				color: var(--themeColor);
-			}
-			.post-meta {
-				font-family: 'Cormorant Garamond', serif;
-				font-size: 0.9rem;
-				color: rgba(255, 255, 255, 0.3);
-				display: flex;
-				gap: 20px;
-			}
-			.post-desc {
-				font-family: 'Cormorant Garamond', serif;
-				font-style: italic;
-				color: rgba(255, 255, 255, 0.5);
-				margin-top: 5px;
-			}
-			.empty-state {
-				text-align: center;
-				color: rgba(255, 255, 255, 0.2);
-				font-family: 'EB Garamond', serif;
-				margin-top: 100px;
-			}
+			main { max-width: 800px; margin: 0 auto; padding: 80px 24px; min-height: 70vh; }
+			.category-title { font-family: 'Cinzel', serif; font-size: 0.8rem; letter-spacing: 0.5em; color: var(--themeColor); margin-bottom: 60px; text-align: center; opacity: 0.8; }
+			.post-list { list-style: none; padding: 0; }
+			.post-item { margin-bottom: 40px; transition: transform 0.3s ease; }
+			.post-link { text-decoration: none; display: block; }
+			.post-link h2 { font-family: 'EB Garamond', serif; font-size: 1.6rem; color: #fff; margin: 0 0 8px 0; transition: color 0.3s ease; }
+			.post-link:hover h2 { color: var(--themeColor); }
+			.post-meta { font-family: 'Cormorant Garamond', serif; font-size: 0.9rem; color: rgba(255, 255, 255, 0.3); display: flex; gap: 20px; }
+			.post-desc { font-family: 'Cormorant Garamond', serif; font-style: italic; color: rgba(255, 255, 255, 0.5); margin-top: 5px; }
+			.empty-state { text-align: center; color: rgba(255, 255, 255, 0.2); font-family: 'EB Garamond', serif; margin-top: 100px; }
 		</style>
 	</head>
 	<body>
@@ -101,21 +53,25 @@ const themeColor = colors[category as keyof typeof colors] || 'var(--accent-gold
 			
 			{posts.length > 0 ? (
 				<ul class="post-list">
-					{posts.map((post) => (
-						<li class="post-item">
-							<a href={`/writing/${category}/${post.id}`} class="post-link">
-								<h2>{post.data.title}</h2>
-								<div class="post-meta">
-									<span>{post.data.pubDate.toLocaleDateString('en-us', {
-										year: 'numeric',
-										month: 'short',
-										day: 'numeric',
-									})}</span>
-									{post.data.description && <span class="post-desc">— {post.data.description}</span>}
-								</div>
-							</a>
-						</li>
-					))}
+					{posts.map((post) => {
+						// 核心修复：确保链接不带 .md 后缀
+						const cleanSlug = post.id.replace(/\.[^/.]+$/, "");
+						return (
+							<li class="post-item">
+								<a href={`/writing/${category}/${cleanSlug}`} class="post-link">
+									<h2>{post.data.title}</h2>
+									<div class="post-meta">
+										<span>{post.data.pubDate.toLocaleDateString('en-us', {
+											year: 'numeric',
+											month: 'short',
+											day: 'numeric',
+										})}</span>
+										{post.data.description && <span class="post-desc">— {post.data.description}</span>}
+									</div>
+								</a>
+							</li>
+						)
+					})}
 				</ul>
 			) : (
 				<div class="empty-state">此档案库暂无记录</div>
