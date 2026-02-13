@@ -1,82 +1,148 @@
 ---
-import { getCollection } from 'astro:content';
+import { getCollection, render } from 'astro:content';
 import BaseHead from '@/components/BaseHead.astro';
 import Header from '@/components/Header.astro';
 import Footer from '@/components/Footer.astro';
-import { SITE_TITLE } from '@/consts';
 
 export async function getStaticPaths() {
-	const categories = ['essays', 'thinking', 'poems', 'goals'];
-	return categories.map(category => ({
-		params: { category },
-		props: { categoryName: category.toUpperCase() },
-	}));
+	const categories = ['essays', 'thinking', 'poems', 'goals'] as const;
+	const allPaths = await Promise.all(
+		categories.map(async (cat) => {
+			const posts = await getCollection(cat);
+			return posts.map(post => {
+				const cleanSlug = post.id.replace(/\.[^/.]+$/, ""); 
+				return {
+					params: { category: cat, slug: cleanSlug },
+					props: { post },
+				};
+			});
+		})
+	);
+	return allPaths.flat();
 }
 
+const { post } = Astro.props;
 const { category } = Astro.params;
-const { categoryName } = Astro.props;
+const { Content } = await render(post);
 
-const posts = (await getCollection(category as any)).sort(
-	(a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf()
-);
-
-const colors = {
-	essays: 'var(--ivory)',
-	poems: 'var(--silver)',
-	thinking: 'var(--accent-gold)',
-	goals: '#b39ddb',
+// 视觉主题配置 - 确保这里的颜色值有效
+const themes = {
+	essays: { color: '#E2E2E2', name: '随笔' }, // 替换 var 为具体值确保渲染
+	poems: { color: '#C0C0C0', name: '诗歌' },
+	thinking: { color: '#D4AF37', name: '思考' },
+	goals: { color: '#B39DDB', name: '目标' },
 };
-const themeColor = colors[category as keyof typeof colors] || 'var(--accent-gold)';
+const currentTheme = themes[category as keyof typeof themes] || themes.essays;
 ---
 
-<!doctype html>
 <html lang="en">
 	<head>
-		<BaseHead title={`${categoryName} - ${SITE_TITLE}`} description={`Archives of ${category}`} />
-		<style define:vars={{ themeColor }}>
-			main { max-width: 800px; margin: 0 auto; padding: 80px 24px; min-height: 70vh; }
-			.category-title { font-family: 'Cinzel', serif; font-size: 0.8rem; letter-spacing: 0.5em; color: var(--themeColor); margin-bottom: 60px; text-align: center; opacity: 0.8; }
-			.post-list { list-style: none; padding: 0; }
-			.post-item { margin-bottom: 40px; transition: transform 0.3s ease; }
-			.post-link { text-decoration: none; display: block; }
-			.post-link h2 { font-family: 'EB Garamond', serif; font-size: 1.6rem; color: #fff; margin: 0 0 8px 0; transition: color 0.3s ease; }
-			.post-link:hover h2 { color: var(--themeColor); }
-			.post-meta { font-family: 'Cormorant Garamond', serif; font-size: 0.9rem; color: rgba(255, 255, 255, 0.3); display: flex; gap: 20px; }
-			.post-desc { font-family: 'Cormorant Garamond', serif; font-style: italic; color: rgba(255, 255, 255, 0.5); margin-top: 5px; }
-			.empty-state { text-align: center; color: rgba(255, 255, 255, 0.2); font-family: 'EB Garamond', serif; margin-top: 100px; }
+		<BaseHead title={post.data.title} description={post.data.description} />
+		<style define:vars={{ themeColor: currentTheme.color }}>
+			/* 顶部进度条 */
+			#progress-bar { 
+				position: fixed; top: 0; left: 0; 
+				width: 0%; height: 2px; 
+				background: var(--themeColor); 
+				z-index: 10000; 
+				transition: width 0.1s ease;
+			}
+
+			main { max-width: 700px; margin: 0 auto; padding: 80px 24px; }
+
+			/* 文章头部 */
+			.article-header { text-align: center; margin-bottom: 5em; }
+			.category-tag { 
+				font-family: 'Cinzel', serif; font-size: 0.75rem; 
+				letter-spacing: 0.5em; color: var(--themeColor); 
+				opacity: 0.6; text-transform: uppercase; 
+				display: block; margin-bottom: 1.5em;
+			}
+			.article-header h1 { 
+				font-family: 'Cinzel', serif; font-size: clamp(1.8rem, 5vw, 2.2rem); 
+				color: #F5F7FA; font-weight: 400; line-height: 1.4;
+			}
+
+			/* --- 正文核心排版 --- */
+			.prose { 
+				font-family: 'EB Garamond', 'Noto Serif SC', serif; 
+				font-size: 1.25rem; line-height: 1.9; 
+				color: rgba(255, 255, 255, 0.85); 
+			}
+
+			/* 1. 修复：首字下沉颜色与样式 */
+			.prose:not(.is-poems) :global(p:first-of-type::first-letter) {
+				font-family: 'Cinzel', serif;
+				font-size: 3.5rem;
+				float: left;
+				line-height: 1;
+				padding-right: 12px;
+				color: var(--themeColor) !important; /* 强制应用主题色 */
+				font-weight: 700;
+			}
+
+			/* 2. 修复：极简线条感引文（你最喜欢的那个） */
+			.prose :global(blockquote) {
+				margin: 4em auto;
+				padding: 2em 0;
+				border-top: 1px solid rgba(255, 255, 255, 0.1);
+				border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+				text-align: center;
+				font-style: italic;
+				color: var(--themeColor);
+				max-width: 85%;
+				opacity: 0.9;
+			}
+			.prose :global(blockquote p) { margin: 0.5em 0; font-size: 1.15rem; }
+
+			/* 诗歌模式：垂直留白与左对齐居中 */
+			.is-poems { display: flex; flex-direction: column; align-items: center; text-align: left; }
+			.is-poems :global(p) { 
+				margin-bottom: 1.5rem; text-align: left; 
+				width: fit-content; min-width: 240px; 
+				letter-spacing: 0.1em; 
+			}
+			.is-poems :global(p:empty) { height: 2em; }
+
+			/* 其他细节 */
+			.prose:not(.is-poems) { text-align: justify; }
+			.post-footer { margin-top: 8em; padding-top: 2em; border-top: 1px solid rgba(255, 255, 255, 0.05); text-align: center; }
+			.back-link { font-family: 'Cinzel', serif; font-size: 0.8rem; color: rgba(255, 255, 255, 0.4); text-decoration: none; letter-spacing: 0.2em; transition: 0.3s; }
+			.back-link:hover { color: var(--themeColor); opacity: 1; }
+
+			@media (max-width: 720px) {
+				main { padding: 40px 20px; }
+				.is-poems { align-items: flex-start; padding-left: 10%; }
+				.is-poems :global(p) { min-width: auto; }
+			}
 		</style>
 	</head>
 	<body>
+		<div id="progress-bar"></div>
 		<Header />
 		<main>
-			<div class="category-title">CHAPTER // {categoryName}</div>
-			
-			{posts.length > 0 ? (
-				<ul class="post-list">
-					{posts.map((post) => {
-						// 核心修复：确保链接不带 .md 后缀
-						const cleanSlug = post.id.replace(/\.[^/.]+$/, "");
-						return (
-							<li class="post-item">
-								<a href={`/writing/${category}/${cleanSlug}`} class="post-link">
-									<h2>{post.data.title}</h2>
-									<div class="post-meta">
-										<span>{post.data.pubDate.toLocaleDateString('en-us', {
-											year: 'numeric',
-											month: 'short',
-											day: 'numeric',
-										})}</span>
-										{post.data.description && <span class="post-desc">— {post.data.description}</span>}
-									</div>
-								</a>
-							</li>
-						)
-					})}
-				</ul>
-			) : (
-				<div class="empty-state">此档案库暂无记录</div>
-			)}
+			<article>
+				<header class="article-header">
+					<span class="category-tag">// {currentTheme.name}</span>
+					<h1>{post.data.title}</h1>
+				</header>
+				<div class={`prose ${category === 'poems' ? 'is-poems' : ''}`}>
+					<Content />
+				</div>
+			</article>
+			<footer class="post-footer">
+				<a href={`/writing/${category}`} class="back-link">← BACK TO {currentTheme.name}</a>
+			</footer>
 		</main>
+		<script>
+			const bar = document.getElementById("progress-bar");
+			window.onscroll = () => {
+				const winScroll = document.documentElement.scrollTop;
+				const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+				const scrolled = (winScroll / height) * 100;
+				if (bar) bar.style.width = scrolled + "%";
+			};
+		</script>
 		<Footer />
 	</body>
 </html>
