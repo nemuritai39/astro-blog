@@ -15,22 +15,94 @@ const photos = (await getCollection('gallery')).sort(
 	<head>
 		<BaseHead title={`Gallery - ${SITE_TITLE}`} description="摄影集" />
 		<style>
-			main { max-width: 1400px; margin: 0 auto; padding: 140px 24px; }
-			.gallery-container { display: grid; grid-template-columns: repeat(12, 1fr); gap: 120px 30px; }
-			.photo-card { grid-column: span 12; position: relative; cursor: zoom-in; }
+			/* 1. 基础设置：增加背景质感 */
+			main { 
+				max-width: 1400px; 
+				margin: 0 auto; 
+				padding: 100px 24px; 
+				overflow-x: hidden; 
+			}
+
+			/* 2. 你的核心设计：错位网格 */
+			.gallery-container { 
+				display: grid; 
+				grid-template-columns: repeat(12, 1fr); 
+				gap: 80px 30px; /* 减小了间距，防止手机端太散 */
+			}
+
+			.photo-card { 
+				grid-column: span 12; 
+				position: relative; 
+				cursor: zoom-in;
+			}
+
+			/* 电脑端保留你牛逼的错位布局 */
 			@media (min-width: 1024px) {
+				.gallery-container { gap: 120px 30px; }
 				.photo-card:nth-child(4n+1) { grid-column: 2 / span 4; } 
 				.photo-card:nth-child(4n+2) { grid-column: 7 / span 5; margin-top: 150px; }
 				.photo-card:nth-child(4n+3) { grid-column: 1 / span 5; }
 				.photo-card:nth-child(4n+4) { grid-column: 7 / span 4; margin-top: -80px; }
 			}
-			.image-wrapper { overflow: hidden; background: #0a0a0a; }
-			.photo-card img { width: 100%; height: auto; display: block; filter: grayscale(20%); transition: 1.5s cubic-bezier(0.16, 1, 0.3, 1); }
-			.photo-card:hover img { filter: grayscale(0%); transform: scale(1.02); }
-			.photo-meta { margin-top: 1.2rem; font-family: 'Cinzel', serif; font-size: 0.7rem; letter-spacing: 0.4em; opacity: 0.6; }
+
+			/* 3. 设计感升级：给照片加个细边框和呼吸感阴影 */
+			.image-wrapper { 
+				overflow: hidden; 
+				background: #0a0a0a; 
+				border: 1px solid rgba(255, 255, 255, 0.1); /* 淡淡的描边 */
+				box-shadow: 0 20px 40px rgba(0,0,0,0.4); /* 增加深度感 */
+			}
+
+			.photo-card img { 
+				width: 100%; 
+				height: auto; 
+				display: block; 
+				filter: grayscale(30%); /* 增加了一点灰度，更有质感 */
+				transition: 1.2s cubic-bezier(0.16, 1, 0.3, 1); 
+			}
+
+			/* 悬停效果：彩色浮现 + 微微放大 */
+			.photo-card:hover img { 
+				filter: grayscale(0%); 
+				transform: scale(1.05); 
+			}
+
+			/* 4. 文字排版优化：解决你说的“太空” */
+			.photo-meta { 
+				margin-top: 1.5rem; 
+				font-family: 'Cinzel', serif; 
+				font-size: 0.75rem; 
+				letter-spacing: 0.4em; 
+				opacity: 0.7; 
+				text-transform: uppercase;
+				border-bottom: 1px solid rgba(255, 255, 255, 0.1); /* 加条线，充实内容 */
+				padding-bottom: 10px;
+				display: inline-block;
+				width: 100%;
+			}
+
+			/* 5. 手机端适配：彻底解决排版问题 */
+			@media (max-width: 768px) {
+				main { padding: 60px 20px; }
+				.gallery-container { 
+					display: flex; /* 手机端直接用 flex 垂直排列最稳 */
+					flex-direction: column;
+					gap: 60px; 
+				}
+				.photo-card { 
+					margin-top: 0 !important; /* 取消电脑端的位移 */
+					width: 100%;
+				}
+				.photo-meta { 
+					font-size: 0.65rem; 
+					letter-spacing: 0.2em; /* 手机端间距调小防止换行 */
+				}
+			}
+
+			/* Lightbox 保持不变 */
 			#lightbox { position: fixed; inset: 0; background: rgba(0,0,0,0.98); display: flex; align-items: center; justify-content: center; z-index: 10000; opacity: 0; visibility: hidden; transition: 0.5s; cursor: zoom-out; }
 			#lightbox.active { opacity: 1; visibility: visible; }
-			#lightbox img { max-width: 90vw; max-height: 85vh; object-fit: contain; }
+			#lightbox img { max-width: 95vw; max-height: 90vh; object-fit: contain; }
 		</style>
 	</head>
 	<body>
