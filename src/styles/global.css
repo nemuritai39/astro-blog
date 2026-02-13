@@ -248,3 +248,41 @@ hr {
 	.social-links{ display: none; }
 	.internal-links a{ padding: 8px 10px; }
 }
+/* --- 手机端适配补丁 --- */
+@media (max-width: 600px) {
+  /* 1. 强制所有容器宽度为 100%，防止左右滑动 */
+  body, html {
+    overflow-x: hidden !important;
+  }
+
+  /* 2. 这里的 .container 和 .content 需要根据你模板的实际类名微调 */
+  div, section, article {
+    max-width: 100% !important;
+    padding-left: 15px !important;
+    padding-right: 15px !important;
+    box-sizing: border-box !important;
+  }
+
+  /* 3. 让文字小一点，别把屏幕撑爆 */
+  h1, h2, .title {
+    font-size: 1.4rem !important;
+    word-break: break-word !important;
+  }
+
+  p, span, .text {
+    font-size: 0.95rem !important;
+    line-height: 1.6 !important;
+  }
+
+  /* 4. 图片自动缩放，别溢出 */
+  img {
+    width: 100% !important;
+    height: auto !important;
+  }
+
+  /* 5. 那个带四个点的输入框和按钮，让它们占满整行 */
+  input, button {
+    width: 100% !important;
+    margin-bottom: 10px !important;
+  }
+}
