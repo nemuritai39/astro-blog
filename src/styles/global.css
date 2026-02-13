@@ -1,92 +1,96 @@
 /*
   Based on Bear Blog default CSS (MIT):
   https://github.com/HermanMartinus/bearblog/blob/master/LICENSE.md
+  
+  Modified for Nemu Archive - Mobile Fixed & Gallery Styled
 */
 
 /* ===== Theme tokens ===== */
 :root {
-	/* Core palette (dark + white/gold + red) */
-	--bg: 11, 13, 16;           /* #0B0D10 */
-	--panel: 16, 19, 24;
-	--text: 245, 247, 250;      /* #F5F7FA */
-	--muted: 183, 190, 200;     /* #B7BEC8 */
-	--border: 255, 255, 255;
+  /* Core palette (dark + white/gold + red) */
+  --bg: 11, 13, 16;           /* #0B0D10 */
+  --panel: 16, 19, 24;
+  --text: 245, 247, 250;      /* #F5F7FA */
+  --muted: 183, 190, 200;     /* #B7BEC8 */
+  --border: 255, 255, 255;
 
-	/* Accents */
-	--gold: 214, 178, 94;       /* #D6B25E */
-	--red: 212, 60, 60;         /* #D43C3C */
+  /* Accents */
+  --gold: 214, 178, 94;       /* #D6B25E */
+  --red: 212, 60, 60;         /* #D43C3C */
 
-	/* Template compatibility */
-	--accent: rgb(var(--gold));
-	--accent-dark: rgb(var(--red));
-	--black: var(--text);
-	--gray: var(--muted);
-	--gray-dark: var(--text);
-	--gray-light: 28, 33, 41;
+  /* Gallery / Polaroid Settings */
+  --polaroid-bg: #ffffff;
+  --polaroid-text: #333333;
 
-	--gray-gradient:
-		rgba(var(--panel), 1),
-		rgba(var(--bg), 1);
+  /* Template compatibility */
+  --accent: rgb(var(--gold));
+  --accent-dark: rgb(var(--red));
+  --black: var(--text);
+  --gray: var(--muted);
+  --gray-dark: var(--text);
+  --gray-light: 28, 33, 41;
 
-	--box-shadow:
-		0 2px 10px rgba(0,0,0,.35),
-		0 12px 34px rgba(0,0,0,.45);
+  --gray-gradient:
+    rgba(var(--panel), 1),
+    rgba(var(--bg), 1);
+
+  --box-shadow:
+    0 2px 10px rgba(0,0,0,.35),
+    0 12px 34px rgba(0,0,0,.45);
 }
 
 /* ===== Fonts ===== */
 @font-face {
-	font-family: "Atkinson";
-	src: url("/fonts/atkinson-regular.woff") format("woff");
-	font-weight: 400;
-	font-style: normal;
-	font-display: swap;
+  font-family: "Atkinson";
+  src: url("/fonts/atkinson-regular.woff") format("woff");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
 }
 @font-face {
-	font-family: "Atkinson";
-	src: url("/fonts/atkinson-bold.woff") format("woff");
-	font-weight: 700;
-	font-style: normal;
-	font-display: swap;
+  font-family: "Atkinson";
+  src: url("/fonts/atkinson-bold.woff") format("woff");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
 }
 
 /* ===== Base ===== */
 body {
-	font-family: "Atkinson", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "PingFang SC",
-		"Microsoft YaHei", Arial, sans-serif;
-	margin: 0;
-	padding: 0;
-	text-align: left;
+  font-family: "Atkinson", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "PingFang SC",
+    "Microsoft YaHei", Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+  text-align: left;
 
-	background: radial-gradient(1200px 600px at 20% -10%, rgba(var(--gold), 0.10), transparent 55%),
-	            radial-gradient(900px 500px at 90% 10%, rgba(var(--red), 0.10), transparent 55%),
-	            linear-gradient(var(--gray-gradient)) no-repeat;
-	background-color: rgb(var(--bg));
-	background-size: 100% 100%;
+  background: radial-gradient(1200px 600px at 20% -10%, rgba(var(--gold), 0.10), transparent 55%),
+              radial-gradient(900px 500px at 90% 10%, rgba(var(--red), 0.10), transparent 55%),
+              linear-gradient(var(--gray-gradient)) no-repeat;
+  background-color: rgb(var(--bg));
+  background-size: 100% 100%;
+  background-attachment: fixed; /* 修复背景滚动问题 */
 
-	word-wrap: break-word;
-	overflow-wrap: break-word;
-	color: rgba(var(--text), 0.92);
-	font-size: 20px;
-	line-height: 1.7;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  color: rgba(var(--text), 0.92);
+  font-size: 20px;
+  line-height: 1.7;
+  overflow-x: hidden; /* 防止横向滚动条 */
 }
 
 main {
-	width: 860px;
-	max-width: calc(100% - 2em);
-	margin: auto;
-	padding: 3.2em 1em;
+  width: 100%;
+  max-width: 860px; /* 限制最大宽度 */
+  margin: auto;
+  padding: 3.2em 1em;
+  box-sizing: border-box; /* 关键：防止padding撑破宽度 */
 }
 
-h1,
-h2,
-h3,
-h4,
-h5,
-h6 {
-	margin: 0 0 0.6rem 0;
-	color: rgba(var(--text), 0.96);
-	line-height: 1.2;
-	letter-spacing: 0.01em;
+h1, h2, h3, h4, h5, h6 {
+  margin: 0 0 0.6rem 0;
+  color: rgba(var(--text), 0.96);
+  line-height: 1.2;
+  letter-spacing: 0.01em;
 }
 
 h1 { font-size: 2.6em; }
@@ -96,193 +100,184 @@ h4 { font-size: 1.2em; }
 h5 { font-size: 1.05em; }
 
 p, li { color: rgba(var(--text), 0.82); }
-
-strong,
-b { font-weight: 700; }
+strong, b { font-weight: 700; }
 
 a {
-	color: rgba(var(--gold), 0.95);
-	text-decoration: none;
+  color: rgba(var(--gold), 0.95);
+  text-decoration: none;
+  transition: color 0.2s ease;
 }
 a:hover {
-	color: rgba(var(--red), 0.95);
+  color: rgba(var(--red), 0.95);
 }
 
 p { margin-bottom: 1em; }
 .prose p { margin-bottom: 2em; }
 
-textarea { width: 100%; font-size: 16px; }
-input { font-size: 16px; }
-table { width: 100%; }
+/* 表单与输入框优化 */
+textarea, input {
+  font-size: 16px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(var(--border), 0.2);
+  color: #fff;
+  padding: 10px 15px;
+  border-radius: 8px;
+  width: 100%;
+  box-sizing: border-box;
+  margin-bottom: 15px;
+}
+
+input:focus, textarea:focus {
+  outline: none;
+  border-color: rgba(var(--gold), 0.8);
+}
+
+button {
+  background: rgba(var(--gold), 0.2);
+  color: rgba(var(--gold), 1);
+  border: 1px solid rgba(var(--gold), 0.5);
+  padding: 10px 20px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 1rem;
+}
 
 img {
-	max-width: 100%;
-	height: auto;
-	border-radius: 12px;
-	border: 1px solid rgba(var(--border), 0.12);
+  max-width: 100%;
+  height: auto;
+  border-radius: 12px;
+  border: 1px solid rgba(var(--border), 0.12);
 }
 
-code {
-	padding: 2px 6px;
-	background-color: rgba(var(--border), 0.08);
-	border: 1px solid rgba(var(--border), 0.10);
-	border-radius: 6px;
-	color: rgba(var(--text), 0.92);
+/* ===== Gallery Styling (拍立得风格) ===== */
+.gallery {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 2rem;
+  margin-top: 3rem;
+  padding: 10px;
 }
 
-pre {
-	padding: 1.2em;
-	border-radius: 12px;
-	background: rgba(var(--border), 0.06);
-	border: 1px solid rgba(var(--border), 0.10);
-}
-pre > code { all: unset; }
-
-blockquote {
-	border-left: 4px solid rgba(var(--gold), 0.85);
-	padding: 14px 16px 14px 18px;
-	margin: 0;
-	font-size: 1.15em;
-	color: rgba(var(--text), 0.92);
-	background: rgba(var(--border), 0.05);
-	border-radius: 12px;
+.gallery-item {
+  background-color: var(--polaroid-bg);
+  padding: 10px 10px 40px 10px; /* 底部留白 */
+  border-radius: 2px;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+  transition: all 0.3s ease;
+  position: relative;
+  transform: rotate(-1deg); /* 默认微倾斜 */
 }
 
-hr {
-	border: none;
-	border-top: 1px solid rgba(var(--border), 0.12);
+/* 偶数图片反向倾斜，增加自然感 */
+.gallery-item:nth-child(even) {
+  transform: rotate(1deg);
 }
 
-@media (max-width: 720px) {
-	body { font-size: 18px; }
-	main { padding: 1.2em 1em; }
+.gallery-item:hover {
+  transform: scale(1.05) rotate(0deg) !important;
+  z-index: 10;
+  box-shadow: 0 8px 25px rgba(0,0,0,0.6);
 }
 
-/* ===== Accessible hidden text ===== */
-.sr-only {
-	border: 0;
-	padding: 0;
-	margin: 0;
-	position: absolute !important;
-	height: 1px;
-	width: 1px;
-	overflow: hidden;
-	clip: rect(1px, 1px, 1px, 1px);
-	clip: rect(1px, 1px, 1px, 1px);
-	clip-path: inset(50%);
-	white-space: nowrap;
+.gallery-item img {
+  width: 100%;
+  height: auto;
+  display: block;
+  border-radius: 0; /* 拍立得不需要圆角 */
+  border: 1px solid #eee;
+  filter: sepia(0.2) contrast(1.1); /* 微微的胶片感 */
 }
 
-/* ===== Header: premium minimal ===== */
+/* 如果你想在照片底部加文字 */
+.gallery-caption {
+  color: var(--polaroid-text);
+  font-size: 0.9rem;
+  text-align: center;
+  margin-top: 10px;
+  font-family: "Shadows Into Light", cursive, sans-serif; /* 手写体风格，如果没有引入则回退 */
+}
+
+/* ===== Header ===== */
 .site-header {
-	position: sticky;
-	top: 0;
-	z-index: 50;
-	background: rgba(var(--bg), 0.78);
-	backdrop-filter: blur(12px);
-	border-bottom: 1px solid rgba(var(--border), 0.10);
-	box-shadow: 0 10px 30px rgba(0,0,0,.25);
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  background: rgba(var(--bg), 0.85);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid rgba(var(--border), 0.10);
 }
 
-.site-nav{
-	max-width: 1100px;
-	margin: 0 auto;
-	padding: 0 16px;
-	display: flex;
-	align-items: center;
-	justify-content: space-between;
-	gap: 16px;
+.site-nav {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 12px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 }
 
-.site-title{
-	margin: 0;
-	font-size: 1rem;
-	letter-spacing: 0.08em;
-	text-transform: uppercase;
+.site-title {
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
 }
 
-.site-title a{
-	color: rgba(var(--text), 0.92);
+.site-title a { color: rgba(var(--text), 0.92); }
+
+/* Internal Links */
+.internal-links {
+  display: flex;
+  gap: 15px;
 }
 
-.internal-links{
-	display: flex;
-	align-items: center;
-	gap: 6px;
-	flex-wrap: wrap;
+.internal-links a {
+  font-size: 0.95rem;
+  padding: 5px 10px;
+  border-radius: 6px;
 }
 
-.internal-links a{
-	padding: 10px 10px;
-	border-radius: 999px;
-	color: rgba(var(--text), 0.88);
-	border: 1px solid transparent;
+.internal-links a.active {
+  color: rgba(var(--gold), 1);
+  background: rgba(var(--gold), 0.1);
 }
 
-.internal-links a:hover{
-	color: rgba(var(--gold), 0.95);
-	border-color: rgba(var(--gold), 0.35);
-	background: rgba(var(--border), 0.04);
-}
-
-.internal-links a.active{
-	color: rgba(var(--red), 0.95);
-	border-color: rgba(var(--red), 0.40);
-	background: rgba(var(--border), 0.04);
-}
-
-.social-links{
-	display: flex;
-	align-items: center;
-	gap: 10px;
-}
-
-.social-links a{
-	color: rgba(var(--text), 0.75);
-}
-.social-links a:hover{
-	color: rgba(var(--gold), 0.95);
-}
-
-@media (max-width: 720px) {
-	.social-links{ display: none; }
-	.internal-links a{ padding: 8px 10px; }
-}
-/* --- 手机端适配补丁 --- */
-@media (max-width: 600px) {
-  /* 1. 强制所有容器宽度为 100%，防止左右滑动 */
-  body, html {
-    overflow-x: hidden !important;
+/* ===== Mobile Responsiveness (Clean Version) ===== */
+@media (max-width: 768px) {
+  body {
+    font-size: 18px; /* 稍微减小手机端字号 */
   }
 
-  /* 2. 这里的 .container 和 .content 需要根据你模板的实际类名微调 */
-  div, section, article {
-    max-width: 100% !important;
-    padding-left: 15px !important;
-    padding-right: 15px !important;
-    box-sizing: border-box !important;
+  main {
+    padding: 2em 1.2em; /* 调整手机端边距 */
+    width: 100%;
   }
 
-  /* 3. 让文字小一点，别把屏幕撑爆 */
-  h1, h2, .title {
-    font-size: 1.4rem !important;
-    word-break: break-word !important;
+  h1 { font-size: 2em; }
+  h2 { font-size: 1.6em; }
+
+  /* 手机端相册调整 */
+  .gallery {
+    grid-template-columns: 1fr; /* 手机端单列显示 */
+    gap: 2rem;
+    padding: 0;
+  }
+  
+  .gallery-item {
+    transform: rotate(0deg); /* 手机端不倾斜，节省空间 */
+    margin-bottom: 20px;
+  }
+  
+  .gallery-item:nth-child(even) {
+    transform: rotate(0deg);
   }
 
-  p, span, .text {
-    font-size: 0.95rem !important;
-    line-height: 1.6 !important;
+  /* 导航栏调整 */
+  .site-nav {
+    flex-direction: column;
+    gap: 10px;
   }
-
-  /* 4. 图片自动缩放，别溢出 */
-  img {
-    width: 100% !important;
-    height: auto !important;
-  }
-
-  /* 5. 那个带四个点的输入框和按钮，让它们占满整行 */
-  input, button {
-    width: 100% !important;
-    margin-bottom: 10px !important;
-  }
+  
+  .social-links { display: none; } /* 手机端隐藏社交图标 */
 }
